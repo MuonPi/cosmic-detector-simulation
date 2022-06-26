@@ -222,11 +222,18 @@ auto main() -> int {
     // with the last element in the vector
 
     // definition of the large double-paddle detector in IIPI-JLU lab
-    const std::vector<Point> large_paddle_points{
-        {-145., -85.},
-        {145., -85.},
-        {145., 85.},
-        {-145., 85.}
+
+    const std::vector<Point> large_paddle_points_upper{
+        {-150., -87.5},
+        {150., -87.5},
+        {150., 87.5},
+        {-150., 87.5}
+    };
+    const std::vector<Point> large_paddle_points_lower{
+        {-150., -100.},
+        {150., -100.},
+        {150., 100.},
+        {-150., 100.}
     };
 
     // definition of the MuonPi standard-size (octagon) detector
@@ -253,8 +260,8 @@ auto main() -> int {
 
     // create 3d objects of type ExtrudedObject defined by the 2d outline,
     // a global position offset and a thickness
-    ExtrudedObject detector1{large_paddle_points, {0.,0.,0.}, 7.};
-    ExtrudedObject detector2{large_paddle_points, {0.,0.,200.}, 7.};
+    ExtrudedObject detector1{large_paddle_points_lower, {0.,0.,0.}, 9.5};
+    ExtrudedObject detector2{large_paddle_points_upper, {0.,0.,200.}, 8.};
 
     // construct a detector setup with the two detectors
     DetectorSetup setup { { detector1, detector2} };
