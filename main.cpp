@@ -207,6 +207,21 @@ auto main() -> int {
     std::random_device rd(0);  // Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
 
+    // the following parameters should be adopted to the individual situation
+    constexpr std::size_t nr_events { 1'000'000 }; //<! the total number of tracks to be simulated
+    constexpr double theta_max { toRad(62.) }; //<! the maximum theta angle taken into account
+    constexpr double theta_step { toRad(1.) }; //<! the desired granularity of the simulated angular distributions
+
+    constexpr std::size_t nr_bins { static_cast<int>(theta_max/theta_step)+1 };
+    std::cout<<"nr of bins: "<<nr_bins<<"\n";
+
+    // vector of 2d polygon vertices defining the shape (in x-y-plane) of the detector.
+    // note, that the points have to be in geometrical sequential order in
+    // counter-clockwise orientation (i.e. a sequence of points defining the detector outline
+    // going in ccw direction). The first point is considered to close the polygon together
+    // with the last element in the vector
+
+    // definition of the large double-paddle detector in IIPI-JLU lab
     const std::vector<Point> large_paddle_points{
         {-145., -85.},
         {145., -85.},
@@ -214,6 +229,7 @@ auto main() -> int {
         {-145., 85.}
     };
 
+    // definition of the MuonPi standard-size (octagon) detector
     const std::vector<Point> octagon_points{
         {-126.5, -20.},
         {-91.5, -62.5},
@@ -225,6 +241,7 @@ auto main() -> int {
         {-126.5, 20.}
     };
 
+    // definition of the MuonPi half-size detector
     const std::vector<Point> half_size_detector_points{
         {-126.5, -20.},
         {-91.5, -62.5},
@@ -234,22 +251,24 @@ auto main() -> int {
         {-126.5, 20.}
     };
 
+    // create 3d objects of type ExtrudedObject defined by the 2d outline,
+    // a global position offset and a thickness
     ExtrudedObject detector1{large_paddle_points, {0.,0.,0.}, 7.};
     ExtrudedObject detector2{large_paddle_points, {0.,0.,200.}, 7.};
 
-    constexpr std::size_t nr_events { 1'000'000 };
-    constexpr double theta_max { toRad(62.) };
-    constexpr double theta_step { toRad(1.) };
-    constexpr std::size_t nr_bins { static_cast<int>(theta_max/theta_step)+1 };
-    std::cout<<"nr of bins: "<<nr_bins<<"\n";
-    
+    // construct a detector setup with the two detectors
     DetectorSetup setup { { detector1, detector2} };
-    
+
+    // first, run a scan over theta angle (uniformly distributed)
+    // to record the detector acceptance
     std::vector<Histogram> histos { theta_scan(setup, gen, nr_events, 0., theta_max, nr_bins) };
+
+    // now, run the full simulation and append the resulting histograms
+    // to the already existing histogram vector
     Append(histos,
            cosmic_simulation(setup, gen, nr_events*nr_bins, theta_max, nr_bins)
     );
-    
+
     // export each histogram into a separate file (human readable ASCII format)
     for ( auto histo: histos ) {
         histo.export_file(histo.getName()+".hist");
