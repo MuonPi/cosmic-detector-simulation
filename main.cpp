@@ -208,7 +208,7 @@ auto main() -> int {
     std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
 
     // the following parameters should be adopted to the individual situation
-    constexpr std::size_t nr_events { 1'000'000 }; //<! the total number of tracks to be simulated
+    constexpr std::size_t nr_events { 100'000 }; //<! the total number of tracks to be simulated
     constexpr double theta_max { toRad(62.) }; //<! the maximum theta angle taken into account
     constexpr double theta_step { toRad(1.) }; //<! the desired granularity of the simulated angular distributions
 
