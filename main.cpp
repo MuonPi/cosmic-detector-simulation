@@ -264,7 +264,7 @@ auto main() -> int {
     ExtrudedObject detector2{large_paddle_points_upper, {0.,0.,200.}, 8.};
 
     // construct a detector setup with the two detectors
-    DetectorSetup setup { { detector1, detector2} };
+    DetectorSetup setup { { detector1, detector2 } };
 
     // first, run a scan over theta angle (uniformly distributed)
     // to record the detector acceptance
