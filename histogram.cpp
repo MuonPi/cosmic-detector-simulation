@@ -1,9 +1,9 @@
+#include <algorithm>
 #include <cmath>
+#include <fstream>
 #include <limits>
 #include <map>
 #include <string>
-#include <algorithm>
-#include <fstream>
 
 #include "histogram.h"
 
@@ -147,7 +147,8 @@ double Histogram::getBinContent(int bin) const
         return double {};
 }
 
-double Histogram::getBinWidth() const {
+double Histogram::getBinWidth() const
+{
     return getRange() / fNrBins;
 }
 
@@ -226,16 +227,17 @@ double Histogram::getEntries() const
     return sum;
 }
 
-double Histogram::getSum(double from, double to) const {
+double Histogram::getSum(double from, double to) const
+{
     double sum { 0 };
     double entries { getEntries() };
     double binwidth { getBinWidth() };
     for (const auto& entry : fHistogramMap) {
-        if (entry.first > from || entry.first < to) sum += entry.second;
+        if (entry.first > from || entry.first < to)
+            sum += entry.second;
     }
     return sum;
 }
-
 
 int Histogram::value2Bin(double value) const
 {
@@ -313,15 +315,15 @@ void Histogram::setAutoscale(bool autoscale)
 
 void Histogram::export_file(const std::string& filename)
 {
-    std::ofstream ofs (filename, std::ofstream::out);
+    std::ofstream ofs(filename, std::ofstream::out);
     ofs << "# Histogram " << getName() << "\n";
     ofs << "# " << getEntries() << " entries\n";
     ofs << "# " << getNrBins() << " bins\n";
-    ofs << "# range: " << getMin() << " to " << getMax()<< "\n";
+    ofs << "# range: " << getMin() << " to " << getMax() << "\n";
     ofs << "# ufl: " << getUnderflow() << "  ovfl: " << getOverflow() << "\n";
-//    ofs << "# sum: " << getSum() << "\n";
+    //    ofs << "# sum: " << getSum() << "\n";
     ofs << "# bin bin_center entries\n";
-    for ( size_t bin { 0 }; bin<getNrBins(); ++bin ) {
+    for (size_t bin { 0 }; bin < getNrBins(); ++bin) {
         ofs << bin << " " << getBinCenter(bin) << " " << getBinContent(bin) << "\n";
     }
     ofs.close();

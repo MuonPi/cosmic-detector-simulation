@@ -1,38 +1,37 @@
+#include <array>
 #include <chrono>
 #include <cmath>
+#include <fstream>
 #include <functional>
 #include <future>
+#include <iomanip>
 #include <iostream>
+#include <numeric>
+#include <random>
 #include <string>
 #include <thread>
 #include <valarray>
 #include <vector>
-#include <random>
-#include <iomanip>
-#include <fstream>
-#include <numeric>
-#include <array>
 
-#include "sampled_distribution.h"
-#include "histogram.h"
-#include "algebra_utils.h"
 #include "algebra_types.h"
-#include "geometry_types.h"
+#include "algebra_utils.h"
 #include "detector_setup.h"
+#include "geometry_types.h"
+#include "histogram.h"
+#include "sampled_distribution.h"
 
-
-constexpr int g_verbosity{3};
-constexpr double toDeg(double x) { return x*180/pi(); }
-constexpr double toRad(double x) { return x*pi()/180; }
+constexpr int g_verbosity { 3 };
+constexpr double toDeg(double x) { return x * 180 / pi(); }
+constexpr double toRad(double x) { return x * pi() / 180; }
 
 /** @brief The cumulative distribution function (CDF) for the cos^2(x) PDF distribution
  * This CDF is used for the calculation of the Probability Density Function (PDF)
  * of the cos^2(x) distribution for generating random values following the angular distribution
  * of the muon tracks
- */ 
-auto cos2cdf = [](double x) { 
+ */
+auto cos2cdf = [](double x) {
     //return cdf to following pdf: cos^2(x)
-    return (2/pi())*(x/2. + sin(2.*x)/4.) + 0.5; //from Wolfram Alpha
+    return (2 / pi()) * (x / 2. + sin(2. * x) / 4.) + 0.5; //from Wolfram Alpha
 };
 
 template <typename T>
@@ -42,56 +41,54 @@ void Append(std::vector<T>& a, const std::vector<T>& b)
     a.insert(a.end(), b.begin(), b.end());
 }
 
-
 std::vector<Histogram> theta_scan(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta_min, double theta_max, std::size_t nr_bins)
 {
     std::vector<Histogram> histos {};
 
     if (setup.ref_detector() == setup.detectors().end()) {
-        std::cerr<<"no reference detector defined in DetectorSetup!\n";
+        std::cerr << "no reference detector defined in DetectorSetup!\n";
         return histos;
     }
 
     Histogram acc_hist("acceptance_scan_theta",
-                       nr_bins,
-                       0., theta_max);
+        nr_bins,
+        0., theta_max);
 
-    std::uniform_real_distribution<> distro_x{
+    std::uniform_real_distribution<> distro_x {
         setup.ref_detector()->bounding_box().first[0],
         setup.ref_detector()->bounding_box().second[0],
     };
-    std::uniform_real_distribution<> distro_y{
+    std::uniform_real_distribution<> distro_y {
         setup.ref_detector()->bounding_box().first[1],
         setup.ref_detector()->bounding_box().second[1],
     };
-    std::uniform_real_distribution<> distro_z{
+    std::uniform_real_distribution<> distro_z {
         setup.ref_detector()->bounding_box().first[2],
         setup.ref_detector()->bounding_box().second[2]
     };
     std::uniform_real_distribution<> distro_phi(-pi(), pi());
 
-    const double theta_step { (theta_max-theta_min)/(nr_bins-1) };
-    std::cout << "#theta acceptance acceptance_error\n"; 
-    for ( double theta { theta_min }; theta < theta_max; theta+=theta_step) {
-        std::size_t mc_events {0};
-        std::size_t detector_events {0};
+    const double theta_step { (theta_max - theta_min) / (nr_bins - 1) };
+    std::cout << "#theta acceptance acceptance_error\n";
+    for (double theta { theta_min }; theta < theta_max; theta += theta_step) {
+        std::size_t mc_events { 0 };
+        std::size_t detector_events { 0 };
         for (std::size_t n = 0; n < nr_events; ++n) {
             double phi { distro_phi(gen) };
             Line line { Line::generate(
-                { distro_x(gen), distro_y(gen), distro_z(gen) }, theta, phi) 
-            };
+                { distro_x(gen), distro_y(gen), distro_z(gen) }, theta, phi) };
 
             bool coincidence { false };
             LineSegment refdet_path { setup.ref_detector()->intersection(line) };
-            if (refdet_path.length() > DEFAULT_EPSILON) { 
+            if (refdet_path.length() > DEFAULT_EPSILON) {
                 mc_events++;
                 coincidence = true;
             }
-            for ( auto detector { setup.detectors().cbegin() };
+            for (auto detector { setup.detectors().cbegin() };
                  detector != setup.detectors().end();
-                ++detector)
-            {
-                if (detector == setup.ref_detector()) continue;
+                 ++detector) {
+                if (detector == setup.ref_detector())
+                    continue;
                 LineSegment det_path { detector->intersection(line) };
                 if (det_path.length() < DEFAULT_EPSILON) {
                     coincidence = false;
@@ -103,9 +100,9 @@ std::vector<Histogram> theta_scan(const DetectorSetup& setup, std::mt19937& gen,
             }
         }
         std::cout << toDeg(theta) << " " << static_cast<double>(detector_events) / mc_events << " " << std::sqrt(detector_events) / mc_events << "\n";
-//        acc_hist.fill(theta, detector_events);
+        //        acc_hist.fill(theta, detector_events);
         acc_hist.fill(theta, static_cast<double>(detector_events) / mc_events);
-        std::cout<<std::flush;
+        std::cout << std::flush;
     }
     histos.push_back(acc_hist);
     return histos;
@@ -117,50 +114,49 @@ std::array<std::array<double, THETA_BINS>, PHI_BINS> theta_phi_scan(const Detect
     std::array<std::array<double, THETA_BINS>, PHI_BINS> phi_theta_acceptance {};
 
     if (setup.ref_detector() == setup.detectors().end()) {
-        std::cerr<<"no reference detector defined in DetectorSetup!\n";
+        std::cerr << "no reference detector defined in DetectorSetup!\n";
         return phi_theta_acceptance;
     }
 
-    std::uniform_real_distribution<> distro_x{
+    std::uniform_real_distribution<> distro_x {
         setup.ref_detector()->bounding_box().first[0],
         setup.ref_detector()->bounding_box().second[0],
     };
-    std::uniform_real_distribution<> distro_y{
+    std::uniform_real_distribution<> distro_y {
         setup.ref_detector()->bounding_box().first[1],
         setup.ref_detector()->bounding_box().second[1],
     };
-    std::uniform_real_distribution<> distro_z{
+    std::uniform_real_distribution<> distro_z {
         setup.ref_detector()->bounding_box().first[2],
         setup.ref_detector()->bounding_box().second[2]
     };
     //std::uniform_real_distribution<> distro_phi(-pi(), pi());
 
-    const double phi_step { (phi_max-phi_min)/(PHI_BINS-1) };
-    const double theta_step { (theta_max-theta_min)/(THETA_BINS-1) };
-    std::cout << "#phi theta acceptance acceptance_error\n"; 
+    const double phi_step { (phi_max - phi_min) / (PHI_BINS - 1) };
+    const double theta_step { (theta_max - theta_min) / (THETA_BINS - 1) };
+    std::cout << "#phi theta acceptance acceptance_error\n";
 
-    for ( std::size_t phi_bin { 0 }; phi_bin < PHI_BINS; phi_bin++) {
-        double phi { phi_min + phi_bin*phi_step };
-        for ( std::size_t theta_bin { 0 }; theta_bin < THETA_BINS; theta_bin++) {
-            double theta { theta_min + theta_bin*theta_step };
-            std::size_t mc_events {0};
-            std::size_t detector_events {0};
+    for (std::size_t phi_bin { 0 }; phi_bin < PHI_BINS; phi_bin++) {
+        double phi { phi_min + phi_bin * phi_step };
+        for (std::size_t theta_bin { 0 }; theta_bin < THETA_BINS; theta_bin++) {
+            double theta { theta_min + theta_bin * theta_step };
+            std::size_t mc_events { 0 };
+            std::size_t detector_events { 0 };
             for (std::size_t n = 0; n < nr_events; ++n) {
                 Line line { Line::generate(
-                    { distro_x(gen), distro_y(gen), distro_z(gen) }, theta, phi) 
-                };
+                    { distro_x(gen), distro_y(gen), distro_z(gen) }, theta, phi) };
 
                 bool coincidence { false };
                 LineSegment refdet_path { setup.ref_detector()->intersection(line) };
-                if (refdet_path.length() > DEFAULT_EPSILON) { 
+                if (refdet_path.length() > DEFAULT_EPSILON) {
                     mc_events++;
                     coincidence = true;
                 }
-                for ( auto detector { setup.detectors().cbegin() };
-                    detector != setup.detectors().end();
-                    ++detector)
-                {
-                    if (detector == setup.ref_detector()) continue;
+                for (auto detector { setup.detectors().cbegin() };
+                     detector != setup.detectors().end();
+                     ++detector) {
+                    if (detector == setup.ref_detector())
+                        continue;
                     LineSegment det_path { detector->intersection(line) };
                     if (det_path.length() < DEFAULT_EPSILON) {
                         coincidence = false;
@@ -172,14 +168,13 @@ std::array<std::array<double, THETA_BINS>, PHI_BINS> theta_phi_scan(const Detect
                 }
             }
             double acceptance { static_cast<double>(detector_events) / mc_events };
-            std::cout << toDeg(phi) << " " << toDeg(theta) << " " <<acceptance << " " << std::sqrt(detector_events) / mc_events << "\n";
+            std::cout << toDeg(phi) << " " << toDeg(theta) << " " << acceptance << " " << std::sqrt(detector_events) / mc_events << "\n";
             phi_theta_acceptance[phi_bin][theta_bin] = acceptance;
-            std::cout<<std::flush;
+            std::cout << std::flush;
         }
     }
     return phi_theta_acceptance;
 }
-
 
 /** @brief cosmic_simulation
  * This function does a full Monte-Carlo simulated evaluation of particle hits for a given detector setup. Tracks are distributed as follows:
@@ -198,75 +193,74 @@ std::vector<Histogram> cosmic_simulation(const DetectorSetup& setup, std::mt1993
 {
     std::vector<Histogram> histos {};
     if (setup.ref_detector() == setup.detectors().end()) {
-        std::cerr<<"no reference detector defined in DetectorSetup!\n";
+        std::cerr << "no reference detector defined in DetectorSetup!\n";
         return histos;
     }
 
-    Histogram theta_hist("theta_distribution",nr_bins, 0., theta_max);
-    Histogram phi_hist("phi_distribution",nr_bins, -pi(), pi());
-    Histogram theta_acc_hist("accepted_theta_distribution",nr_bins, 0., theta_max);
-    Histogram phi_acc_hist("accepted_phi_distribution",nr_bins, -pi(), pi());
-    
-    std::uniform_real_distribution<> distro_x{
+    Histogram theta_hist("theta_distribution", nr_bins, 0., theta_max);
+    Histogram phi_hist("phi_distribution", nr_bins, -pi(), pi());
+    Histogram theta_acc_hist("accepted_theta_distribution", nr_bins, 0., theta_max);
+    Histogram phi_acc_hist("accepted_phi_distribution", nr_bins, -pi(), pi());
+
+    std::uniform_real_distribution<> distro_x {
         setup.ref_detector()->bounding_box().first[0],
         setup.ref_detector()->bounding_box().second[0],
     };
-    std::cout<<"x-bounds: min="<<setup.ref_detector()->bounding_box().first[0]<<" max="<<setup.ref_detector()->bounding_box().second[0]<<"\n";
+    std::cout << "x-bounds: min=" << setup.ref_detector()->bounding_box().first[0] << " max=" << setup.ref_detector()->bounding_box().second[0] << "\n";
 
-    std::uniform_real_distribution<> distro_y{
+    std::uniform_real_distribution<> distro_y {
         setup.ref_detector()->bounding_box().first[1],
         setup.ref_detector()->bounding_box().second[1],
     };
-    std::cout<<"y-bounds: min="<<setup.ref_detector()->bounding_box().first[1]<<" max="<<setup.ref_detector()->bounding_box().second[1]<<"\n";
+    std::cout << "y-bounds: min=" << setup.ref_detector()->bounding_box().first[1] << " max=" << setup.ref_detector()->bounding_box().second[1] << "\n";
 
-    std::uniform_real_distribution<> distro_z{
+    std::uniform_real_distribution<> distro_z {
         setup.ref_detector()->bounding_box().first[2] + DEFAULT_EPSILON,
         setup.ref_detector()->bounding_box().second[2] - DEFAULT_EPSILON
     };
-    std::cout<<"z-bounds: min="<<setup.ref_detector()->bounding_box().first[2]<<" max="<<setup.ref_detector()->bounding_box().second[2]<<"\n";
+    std::cout << "z-bounds: min=" << setup.ref_detector()->bounding_box().first[2] << " max=" << setup.ref_detector()->bounding_box().second[2] << "\n";
 
     std::uniform_real_distribution<> distro_phi(-pi(), pi());
-    SampledDistribution distro_theta(cos2cdf, 0.0, pi()/2, 65536);
+    SampledDistribution distro_theta(cos2cdf, 0.0, pi() / 2, 65536);
 
-    std::size_t mc_events {0};
-    std::size_t detector_events {0};
+    std::size_t mc_events { 0 };
+    std::size_t detector_events { 0 };
     for (std::size_t n = 0; n < nr_events; ++n) {
-            const double theta { distro_theta(gen) };
-            const double phi { distro_phi(gen) };
-            Line line { Line::generate(
-                {
-                    distro_x(gen),
-                    distro_y(gen),
-                    /*setup.ref_detector()->bounding_box().second[2]*/
-                    distro_z(gen)
-                }, theta, phi)
-            };
-                        
-            bool coincidence { false };
-            LineSegment refdet_path { setup.ref_detector()->intersection(line) };
-            if (refdet_path.length() > DEFAULT_EPSILON) { 
-                theta_hist.fill(theta);
-                phi_hist.fill(phi);
-                mc_events++;
-                if (mc_events%100000 == 0) std::cout<<mc_events<<" MC events\n";
-                coincidence = true;
+        const double theta { distro_theta(gen) };
+        const double phi { distro_phi(gen) };
+        Line line { Line::generate(
+            { distro_x(gen),
+                distro_y(gen),
+                /*setup.ref_detector()->bounding_box().second[2]*/
+                distro_z(gen) },
+            theta, phi) };
+
+        bool coincidence { false };
+        LineSegment refdet_path { setup.ref_detector()->intersection(line) };
+        if (refdet_path.length() > DEFAULT_EPSILON) {
+            theta_hist.fill(theta);
+            phi_hist.fill(phi);
+            mc_events++;
+            if (mc_events % 100000 == 0)
+                std::cout << mc_events << " MC events\n";
+            coincidence = true;
+        }
+        for (auto detector { setup.detectors().cbegin() };
+             detector != setup.detectors().end();
+             ++detector) {
+            if (detector == setup.ref_detector())
+                continue;
+            LineSegment det_path { detector->intersection(line) };
+            if (det_path.length() < DEFAULT_EPSILON) {
+                coincidence = false;
             }
-            for ( auto detector { setup.detectors().cbegin() };
-                 detector != setup.detectors().end();
-                ++detector)
-            {
-                if (detector == setup.ref_detector()) continue;
-                LineSegment det_path { detector->intersection(line) };
-                if (det_path.length() < DEFAULT_EPSILON) {
-                    coincidence = false;
-                }
-            }
-            if (coincidence) {
-                //std::cout << n << " " << std::setw(2) << toDeg(theta) << " " << toDeg(phi) << " " << det1_path.length() << " " << det2_path.length() << "\n";
-                theta_acc_hist.fill(theta);
-                phi_acc_hist.fill(phi);
-                detector_events++;
-            }
+        }
+        if (coincidence) {
+            //std::cout << n << " " << std::setw(2) << toDeg(theta) << " " << toDeg(phi) << " " << det1_path.length() << " " << det2_path.length() << "\n";
+            theta_acc_hist.fill(theta);
+            phi_acc_hist.fill(phi);
+            detector_events++;
+        }
     }
     std::cout << "MC events: " << mc_events << " detected events: " << detector_events << " acceptance: " << static_cast<double>(detector_events) / mc_events << " err(acceptance): " << std::sqrt(detector_events) / mc_events << "\n";
     histos.push_back(std::move(theta_hist));
@@ -276,11 +270,12 @@ std::vector<Histogram> cosmic_simulation(const DetectorSetup& setup, std::mt1993
     return histos;
 }
 
-auto main() -> int {
+auto main() -> int
+{
     std::cout << "detector MC simulator\n";
-    
+
     // set up random number generator
-    std::random_device rd;  // Will be used to obtain a seed for the random number engine
+    std::random_device rd; // Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
 
     // the following parameters should be adopted to the individual situation
@@ -288,8 +283,8 @@ auto main() -> int {
     constexpr double theta_max { toRad(90.) }; //<! the maximum theta angle taken into account
     constexpr double theta_step { toRad(1.) }; //<! the desired granularity of the simulated angular distributions
 
-    constexpr std::size_t nr_bins { static_cast<int>(theta_max/theta_step)+1 };
-    std::cout<<"nr of bins: "<<nr_bins<<"\n";
+    constexpr std::size_t nr_bins { static_cast<int>(theta_max / theta_step) + 1 };
+    std::cout << "nr of bins: " << nr_bins << "\n";
 
     // vector of 2d polygon vertices defining the shape (in x-y-plane) of the detector.
     // note, that the points have to be in geometrical sequential order in
@@ -299,65 +294,65 @@ auto main() -> int {
 
     // definition of the large double-paddle detector in IIPI-JLU lab
 
-    const std::vector<Point> large_paddle_points_upper{
-        {-150., -87.5},
-        {150., -87.5},
-        {150., 87.5},
-        {-150., 87.5}
+    const std::vector<Point> large_paddle_points_upper {
+        { -150., -87.5 },
+        { 150., -87.5 },
+        { 150., 87.5 },
+        { -150., 87.5 }
     };
-    const std::vector<Point> large_paddle_points_lower{
-        {-150., -100.},
-        {150., -100.},
-        {150., 100.},
-        {-150., 100.}
+    const std::vector<Point> large_paddle_points_lower {
+        { -150., -100. },
+        { 150., -100. },
+        { 150., 100. },
+        { -150., 100. }
     };
 
     // definition of the MuonPi standard-size (octagon) detector
-    const std::vector<Point> octagon_points{
-        {-126.5, -20.},
-        {-91.5, -62.5},
-        {91.5, -62.5},
-        {126.5, -20.},
-        {126.5, 20.},
-        {91.5, 62.5},
-        {-91.5, 62.5},
-        {-126.5, 20.}
+    const std::vector<Point> octagon_points {
+        { -126.5, -20. },
+        { -91.5, -62.5 },
+        { 91.5, -62.5 },
+        { 126.5, -20. },
+        { 126.5, 20. },
+        { 91.5, 62.5 },
+        { -91.5, 62.5 },
+        { -126.5, 20. }
     };
 
     // definition of the MuonPi half-size detector
-    const std::vector<Point> half_size_detector_points{
-        {-126.5, -20.},
-        {-91.5, -62.5},
-        {0., -62.5},
-        {0., 62.5},
-        {-91.5, 62.5},
-        {-126.5, 20.}
+    const std::vector<Point> half_size_detector_points {
+        { -126.5, -20. },
+        { -91.5, -62.5 },
+        { 0., -62.5 },
+        { 0., 62.5 },
+        { -91.5, 62.5 },
+        { -126.5, 20. }
     };
 
     // definition of the MuonPi hexagon (small-size) detector
     constexpr double hex_length_a { 34.64 };
     constexpr double hex_length_b { 30.0 };
-    
-    const std::vector<Point> hexagon_detector_points{
-        {-hex_length_a, 0.},
-        {-hex_length_a/2, -hex_length_b},
-        {hex_length_a/2., -hex_length_b},
-        {hex_length_a, 0.},
-        {hex_length_a/2, hex_length_b},
-        {-hex_length_a/2, hex_length_b}
+
+    const std::vector<Point> hexagon_detector_points {
+        { -hex_length_a, 0. },
+        { -hex_length_a / 2, -hex_length_b },
+        { hex_length_a / 2., -hex_length_b },
+        { hex_length_a, 0. },
+        { hex_length_a / 2, hex_length_b },
+        { -hex_length_a / 2, hex_length_b }
     };
 
     // create 3d objects of type ExtrudedObject defined by the 2d outline,
     // a global position offset and a thickness
-    ExtrudedObject detector1{large_paddle_points_lower, {0.,0.,0.}, 10.};
-    ExtrudedObject detector2{large_paddle_points_upper, {0.,0.,200. }, 10.};
+    ExtrudedObject detector1 { large_paddle_points_lower, { 0., 0., 0. }, 10. };
+    ExtrudedObject detector2 { large_paddle_points_upper, { 0., 0., 200. }, 10. };
 
     // construct a detector setup with the two detectors
     DetectorSetup setup { { detector1, detector2 } };
 
     // uncomment the following block to calculate the double differential acceptance
     // as function of phi and theta
-/*
+    /*
     auto acceptance_phi_theta = theta_phi_scan<361, 46>(setup, gen, nr_events, 0., theta_max, -pi(), pi());
 //    return 0;
 */
@@ -372,12 +367,11 @@ auto main() -> int {
     // now, run the full simulation and append the resulting histograms
     // to the already existing histogram vector
     Append(histos,
-           cosmic_simulation(setup, gen, nr_events*nr_bins, theta_max, nr_bins)
-    );
+        cosmic_simulation(setup, gen, nr_events * nr_bins, theta_max, nr_bins));
 
     // export each histogram into a separate file (human readable ASCII format)
-    for ( auto histo: histos ) {
-        histo.export_file(histo.getName()+".hist");
+    for (auto histo : histos) {
+        histo.export_file(histo.getName() + ".hist");
     }
 
     exit(0);
