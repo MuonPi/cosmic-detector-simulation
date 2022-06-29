@@ -356,6 +356,14 @@ auto main() -> int
         { -hex_length_a / 2, hex_length_b }
     };
 
+    // definition of the large detector bars for JLU cosmic detector array
+    const std::vector<Point> large_bar_points {
+        { -500., -50. },
+        {  500., -50. },
+        {  500.,  50. },
+        { -500.,  50. },
+    };
+
     // create 3d objects of type ExtrudedObject defined by the 2d outline,
     // a global position offset and a thickness
     ExtrudedObject detector1 { large_paddle_points_lower, { 0., 0., 0. }, 10. };
