@@ -231,10 +231,15 @@ std::vector<Histogram> cosmic_simulation(const DetectorSetup& setup, std::mt1993
     std::size_t mc_events {0};
     std::size_t detector_events {0};
     for (std::size_t n = 0; n < nr_events; ++n) {
-            double theta { distro_theta(gen) };
-            double phi { distro_phi(gen) };
+            const double theta { distro_theta(gen) };
+            const double phi { distro_phi(gen) };
             Line line { Line::generate(
-                { distro_x(gen), distro_y(gen), distro_z(gen) }, theta, phi) 
+                {
+                    distro_x(gen),
+                    distro_y(gen),
+                    /*setup.ref_detector()->bounding_box().second[2]*/
+                    distro_z(gen)
+                }, theta, phi)
             };
                         
             bool coincidence { false };
