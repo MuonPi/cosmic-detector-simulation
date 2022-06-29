@@ -220,8 +220,8 @@ std::vector<Histogram> cosmic_simulation(const DetectorSetup& setup, std::mt1993
     std::cout<<"y-bounds: min="<<setup.ref_detector()->bounding_box().first[1]<<" max="<<setup.ref_detector()->bounding_box().second[1]<<"\n";
 
     std::uniform_real_distribution<> distro_z{
-        setup.ref_detector()->bounding_box().first[2],
-        setup.ref_detector()->bounding_box().second[2]
+        setup.ref_detector()->bounding_box().first[2] + DEFAULT_EPSILON,
+        setup.ref_detector()->bounding_box().second[2] - DEFAULT_EPSILON
     };
     std::cout<<"z-bounds: min="<<setup.ref_detector()->bounding_box().first[2]<<" max="<<setup.ref_detector()->bounding_box().second[2]<<"\n";
 
