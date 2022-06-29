@@ -41,6 +41,20 @@ void Append(std::vector<T>& a, const std::vector<T>& b)
     a.insert(a.end(), b.begin(), b.end());
 }
 
+/** @brief theta_scan
+ * This function does Monte-Carlo simulated evaluation of particle hits for a given detector setup iterating over the specified theta angular range. Tracks are distributed as follows:
+ * - phi: uniformly distributed in -pi..pi
+ * - theta: iterating from theta_min to theta_max in nr_bins steps
+ * @arg setup DetectorSetup object containing the detector definitions
+ * @arg gen random number generator (Mersenne-Twister engine of type std::mt19937)
+ * @arg nr_events The number of tracks to be generated per theta bin. This is not identical to the number of MC events (=events having a hit in the reference detector)
+ * @arg theta_min the minimum zenith angle theta from which events are generated
+ * @arg theta_max the maximum zenith angle theta up to which events are generated
+ * @arg nr_bins The number of bins in the resulting acceptance histogram
+ * @return A std::vector of Histogram objects containing the resulting distributions. Currently, only the angular acceptance (detection efficiency vs. theta) is provided
+ * @note In case of an error, the returned histogram vector is empty
+ * @note The setup object must have the ref_detector iterator set to any valid detector it contains.
+*/
 std::vector<Histogram> theta_scan(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta_min, double theta_max, std::size_t nr_bins)
 {
     std::vector<Histogram> histos {};
