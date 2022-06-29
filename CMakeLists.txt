@@ -19,19 +19,19 @@ ADD_DEFINITIONS(-O3)
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 set(SOURCE_FILES
-    "main.cpp"
-    "algebra_utils.cpp"
-    "geometry_types.cpp"
-    "histogram.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/algebra_utils.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/geometry_types.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/histogram.cpp"
 )
 
 set(HEADER_FILES
-    "histogram.h"
-    "sampled_distribution.h"
-    "algebra_types.h"
-    "algebra_utils.h"
-    "geometry_types.h"
-    "detector_setup.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/histogram.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sampled_distribution.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/algebra_types.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/algebra_utils.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/geometry_types.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/detector_setup.h"
 )
 
 # tell cmake to build our executable
