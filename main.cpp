@@ -285,7 +285,7 @@ auto main() -> int {
 
     // the following parameters should be adopted to the individual situation
     constexpr std::size_t nr_events { 100'000 }; //<! the total number of tracks to be simulated
-    constexpr double theta_max { toRad(62.) }; //<! the maximum theta angle taken into account
+    constexpr double theta_max { toRad(90.) }; //<! the maximum theta angle taken into account
     constexpr double theta_step { toRad(1.) }; //<! the desired granularity of the simulated angular distributions
 
     constexpr std::size_t nr_bins { static_cast<int>(theta_max/theta_step)+1 };
