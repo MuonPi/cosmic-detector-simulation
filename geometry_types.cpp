@@ -37,18 +37,21 @@ auto Plane::distance(const Point &point) const -> double {
 }
 
 auto Plane::intersection(const Line &line) const -> Point {
-    if ( isFuzzySame(p,line.p) ) return p;
+    if ( isFuzzySame(p,line.p) ) {
+        std::cout<<"Plane::intersection(const Line&): reference points are identical!\n";
+        return p;
+    }
     double v1 { ((p - line.p) * normal()).sum() };
     double v2 { (line.q * normal()).sum() };
-/*
+
     if ( inEpsilon(v1) ) {
-        std::cerr << "Error in Plane::intersection(const Line&): line is contained entirely in plane\n";
-        return { 0., 0., -1. };
+        //std::cerr << "Error in Plane::intersection(const Line&): line is contained entirely in plane v1="<<v1<<" v2="<<v2<<" this->p="<<p<<" line.p="<<line.p<<" this->normal()="<<normal()<<" (p-line.p)="<<p-line.p<<" (p-line.p)*normal="<<(p-line.p)*normal()<<"\n";
+        return p;
     }
-*/
+
     if ( inEpsilon(v2) ) {
-//      std::cerr << "Error in Plane::intersection(const Line&): line is not intersecting the plane\n";
-        return { 0., 0., -1. };
+      //std::cerr << "Error in Plane::intersection(const Line&): line is not intersecting the plane\n";
+        return { -100000., -100000., -100000. };
     }
     double t { v1 / v2 };
     return line(t);
@@ -104,6 +107,8 @@ auto ExtrudedObject::intersection(const Line &path) const -> LineSegment {
             { hitpoints[0], hitpoints[1]-hitpoints[0] },
             0., 1.
         };
+    } else if (hitpoints.size() > 2) {
+//        std::cerr<<"ExtrudedObject::intersection(const Line&): strange nr of intersection points: " << hitpoints.size() << "\n";
     }
     return LineSegment {  };
 }
