@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <fstream>
 #include <numeric>
+#include <array>
 
 #include "sampled_distribution.h"
 #include "histogram.h"
@@ -109,6 +110,76 @@ std::vector<Histogram> theta_scan(const DetectorSetup& setup, std::mt19937& gen,
     histos.push_back(acc_hist);
     return histos;
 }
+
+template <int PHI_BINS = 256, int THETA_BINS = 256>
+std::array<std::array<double, THETA_BINS>, PHI_BINS> theta_phi_scan(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta_min, double theta_max, double phi_min, double phi_max)
+{
+    std::array<std::array<double, THETA_BINS>, PHI_BINS> phi_theta_acceptance {};
+
+    if (setup.ref_detector() == setup.detectors().end()) {
+        std::cerr<<"no reference detector defined in DetectorSetup!\n";
+        return phi_theta_acceptance;
+    }
+
+    std::uniform_real_distribution<> distro_x{
+        setup.ref_detector()->bounding_box().first[0],
+        setup.ref_detector()->bounding_box().second[0],
+    };
+    std::uniform_real_distribution<> distro_y{
+        setup.ref_detector()->bounding_box().first[1],
+        setup.ref_detector()->bounding_box().second[1],
+    };
+    std::uniform_real_distribution<> distro_z{
+        setup.ref_detector()->bounding_box().first[2],
+        setup.ref_detector()->bounding_box().second[2]
+    };
+    //std::uniform_real_distribution<> distro_phi(-pi(), pi());
+
+    const double phi_step { (phi_max-phi_min)/(PHI_BINS-1) };
+    const double theta_step { (theta_max-theta_min)/(THETA_BINS-1) };
+    std::cout << "#phi theta acceptance acceptance_error\n"; 
+
+    for ( std::size_t phi_bin { 0 }; phi_bin < PHI_BINS; phi_bin++) {
+        double phi { phi_min + phi_bin*phi_step };
+        for ( std::size_t theta_bin { 0 }; theta_bin < THETA_BINS; theta_bin++) {
+            double theta { theta_min + theta_bin*theta_step };
+            std::size_t mc_events {0};
+            std::size_t detector_events {0};
+            for (std::size_t n = 0; n < nr_events; ++n) {
+                Line line { Line::generate(
+                    { distro_x(gen), distro_y(gen), distro_z(gen) }, theta, phi) 
+                };
+
+                bool coincidence { false };
+                LineSegment refdet_path { setup.ref_detector()->intersection(line) };
+                if (refdet_path.length() > DEFAULT_EPSILON) { 
+                    mc_events++;
+                    coincidence = true;
+                }
+                for ( auto detector { setup.detectors().cbegin() };
+                    detector != setup.detectors().end();
+                    ++detector)
+                {
+                    if (detector == setup.ref_detector()) continue;
+                    LineSegment det_path { detector->intersection(line) };
+                    if (det_path.length() < DEFAULT_EPSILON) {
+                        coincidence = false;
+                    }
+                }
+                if (coincidence) {
+                    //std::cout << n << " " << std::setw(2) << toDeg(theta) << " " << toDeg(phi) << " " << det1_path.length() << " " << det2_path.length() << "\n";
+                    detector_events++;
+                }
+            }
+            double acceptance { static_cast<double>(detector_events) / mc_events };
+            std::cout << toDeg(phi) << " " << toDeg(theta) << " " <<acceptance << " " << std::sqrt(detector_events) / mc_events << "\n";
+            phi_theta_acceptance[phi_bin][theta_bin] = acceptance;
+            std::cout<<std::flush;
+        }
+    }
+    return phi_theta_acceptance;
+}
+
 
 /** @brief cosmic_simulation
  * This function does a full Monte-Carlo simulated evaluation of particle hits for a given detector setup. Tracks are distributed as follows:
@@ -258,17 +329,40 @@ auto main() -> int {
         {-126.5, 20.}
     };
 
+    // definition of the MuonPi hexagon (small-size) detector
+    constexpr double hex_length_a { 34.64 };
+    constexpr double hex_length_b { 30.0 };
+    
+    const std::vector<Point> hexagon_detector_points{
+        {-hex_length_a, 0.},
+        {-hex_length_a/2, -hex_length_b},
+        {hex_length_a/2., -hex_length_b},
+        {hex_length_a, 0.},
+        {hex_length_a/2, hex_length_b},
+        {-hex_length_a/2, hex_length_b}
+    };
+
     // create 3d objects of type ExtrudedObject defined by the 2d outline,
     // a global position offset and a thickness
-    ExtrudedObject detector1{large_paddle_points_lower, {0.,0.,0.}, 9.5};
-    ExtrudedObject detector2{large_paddle_points_upper, {0.,0.,200.}, 8.};
+    ExtrudedObject detector1{large_paddle_points_lower, {0.,0.,0.}, 10.};
+    ExtrudedObject detector2{large_paddle_points_upper, {0.,0.,200. }, 10.};
 
     // construct a detector setup with the two detectors
     DetectorSetup setup { { detector1, detector2 } };
 
-    // first, run a scan over theta angle (uniformly distributed)
-    // to record the detector acceptance
-    std::vector<Histogram> histos { theta_scan(setup, gen, nr_events, 0., theta_max, nr_bins) };
+    // uncomment the following block to calculate the double differential acceptance
+    // as function of phi and theta
+/*
+    auto acceptance_phi_theta = theta_phi_scan<361, 46>(setup, gen, nr_events, 0., theta_max, -pi(), pi());
+//    return 0;
+*/
+
+    // initialize the histogram vector
+    std::vector<Histogram> histos {};
+
+    // run a scan over theta angle (uniformly distributed)
+    // to record the detector acceptance, if required
+    Append(histos, theta_scan(setup, gen, nr_events, 0., theta_max, nr_bins));
 
     // now, run the full simulation and append the resulting histograms
     // to the already existing histogram vector
