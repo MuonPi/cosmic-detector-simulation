@@ -15,7 +15,7 @@ std::ostream &operator<<(std::ostream &os, const std::valarray<double> &p) {
 }
 
 auto norm(const Vector &vec) -> double {
-  constexpr int exponent{2};
+  constexpr double exponent{2};
   return std::sqrt(std::pow(vec, exponent).sum());
 }
 

@@ -115,7 +115,7 @@ auto ExtrudedObject::getPlanes() const -> std::vector<Plane> {
             return planes;
         }
         for (auto vertex { m_vertices.begin() };
-             vertex < std::prev(m_vertices.end());
+             vertex != std::prev(m_vertices.end());
              ++vertex ) {
             Point p0 { Point{ (*vertex)[0], (*vertex)[1], 0. } + m_position };
             Point p1 { Point{(*std::next(vertex))[0], (*std::next(vertex))[1], 0.} + m_position };
@@ -129,7 +129,7 @@ auto ExtrudedObject::getPlanes() const -> std::vector<Plane> {
         Plane plane { p0, p1 - p0, p2 - p0 };
         planes.push_back( std::move(plane) );
         planes.push_back( { m_position, {-1.,0.,0.}, {0.,1.,0.} } );
-        planes.push_back( { m_position + m_thickness, {1.,0.,0.}, {0.,1.,0.} } );
+        planes.push_back( { m_position + Vector{0.,0.,m_thickness}, {1.,0.,0.}, {0.,1.,0.} } );
         return planes;
 }
 
@@ -160,7 +160,7 @@ auto ExtrudedObject::bounding_box() const -> std::pair<Point,Point> {
     }
     min_coordinates += m_position;
     max_coordinates += m_position;
-    max_coordinates += { 0, 0, m_thickness };
+    max_coordinates += { 0., 0., m_thickness };
     return std::make_pair<Point, Point>(std::move(min_coordinates), std::move(max_coordinates));
 }
 
@@ -170,7 +170,7 @@ auto Line::generate(Point p0, double theta, double phi) -> Line {
         {
             std::sin(theta) * std::cos(phi),
             std::sin(theta) * std::sin(phi),
-            -std::cos(theta)
+            std::cos(theta)
         }
     };
 }
