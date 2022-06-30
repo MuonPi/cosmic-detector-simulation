@@ -4,6 +4,10 @@
 
 #include "geometry_types.h"
 
+/** @brief DetectorSetup - class for managing geometric objects of type ExtrudedObject
+ * This class simply stores a list of ExtrudedObject detector objects for convenience.
+ * @note The first detector of the vector which is supplied to the constructor is det as reference detector. The assignment of the ref detector can be changed with the DetectorSetup::ref_detector() method
+*/
 class DetectorSetup {
 public:
     DetectorSetup() = delete;
