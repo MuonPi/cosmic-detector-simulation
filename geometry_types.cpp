@@ -29,8 +29,10 @@ auto Plane::normal() const -> Vector
     Vector normalvec { cross_product(q, r) };
     double veclength { norm(normalvec) };
     if (inEpsilon(veclength)) {
+        throw no_normal("plane has degenerate normal");
+        return { };
         std::cerr << "Error in Plane::normal(): normal vector with length=0!\n";
-        return { 0, 0, 0 };
+        return { };
     }
     return normalvec / veclength;
 }
@@ -56,7 +58,8 @@ auto Plane::intersection(const Line& line) const -> Point
 
     if (inEpsilon(v2)) {
         //std::cerr << "Error in Plane::intersection(const Line&): line is not intersecting the plane\n";
-        return { -100000., -100000., -100000. };
+        throw no_intersection("Plane::intersection(const Line&): line is not intersecting the plane");
+        return { };
     }
     double t { v1 / v2 };
     return line(t);
@@ -84,7 +87,12 @@ auto ExtrudedObject::intersection(const Line& path) const -> LineSegment
 {
     std::vector<Point> hitpoints {};
     for (const auto& plane : m_planes) {
-        Point hitpoint { plane.intersection(path) };
+        Point hitpoint {};
+        try {
+            hitpoint = { plane.intersection(path) };
+        } catch (std::exception& e) {
+            continue;
+        }
         if (hitpoint[2] < m_position[2] || hitpoint[2] > m_position[2] + m_thickness)
             continue;
         hitpoints.push_back(std::move(hitpoint));

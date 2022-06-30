@@ -4,6 +4,7 @@
 #include <functional>
 #include <valarray>
 #include <vector>
+#include <stdexcept>
 
 #include "algebra_types.h"
 
@@ -26,6 +27,8 @@ struct Plane {
     Point p {};
     Vector q {};
     Vector r {};
+    struct no_normal : std::runtime_error { using std::runtime_error::runtime_error; };
+    struct no_intersection : std::runtime_error { using std::runtime_error::runtime_error; };
     auto operator()(double t, double s) const -> Point;
     auto normal() const -> Vector;
     auto distance(const Point& point) const -> double;
