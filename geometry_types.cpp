@@ -45,7 +45,7 @@ auto Plane::distance(const Point& point) const -> double
 auto Plane::intersection(const Line& line) const -> Point
 {
     if (isFuzzySame(p, line.p)) {
-        std::cout << "Plane::intersection(const Line&): reference points are identical!\n";
+        // reference points are identical
         return p;
     }
     double v1 { ((p - line.p) * normal()).sum() };
