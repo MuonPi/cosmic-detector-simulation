@@ -154,6 +154,7 @@ auto ExtrudedObject::getPlanes() const -> std::vector<Plane>
 {
     std::vector<Plane> planes {};
     if (m_vertices.size() < 3) {
+        throw std::runtime_error("Error in ExtrudedObject::getPlanes(): insufficient number of vertices ("+ std::to_string(m_vertices.size())+")!");
         std::cerr << "Error in ExtrudedObject::getPlanes(): insufficient number of vertices (" << m_vertices.size() << ")!\n";
         return planes;
     }
