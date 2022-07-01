@@ -130,14 +130,25 @@ double simulate_geometric_aperture(const DetectorSetup& setup, std::mt19937& gen
         return {};
     }
 
+    auto bounds { setup.ref_detector()->bounding_box() };
+    Point dimensions { bounds.second - bounds.first };
+    std::cout << "detector bounds: min=" << bounds.first << " max=" << bounds.second << "\n";
+    std::cout << "detector dimensions=" << dimensions << "\n";
+
+    bounds.first -= dimensions * 5;
+    bounds.second += dimensions * 5;
+
+    std::cout << "simulation bounds: min=" << bounds.first << " max=" << bounds.second << "\n";
+
     std::uniform_real_distribution<> distro_x {
-        -5000.,
-        5000.,
+        bounds.first[0],
+        bounds.second[0]
     };
     std::uniform_real_distribution<> distro_y {
-        -5000.,
-        5000.,
+        bounds.first[1],
+        bounds.second[1]
     };
+    const double simulation_plane_z_pos { setup.ref_detector()->bounding_box().first[2] };
     std::uniform_real_distribution<> distro_z {
         setup.ref_detector()->bounding_box().first[2],
         setup.ref_detector()->bounding_box().second[2]
@@ -148,7 +159,7 @@ double simulate_geometric_aperture(const DetectorSetup& setup, std::mt19937& gen
     std::size_t detector_events { 0 };
     for (std::size_t n = 0; n < nr_events; ++n) {
         const double phi { (inEpsilon(theta))?0.:distro_phi(gen) };
-        Line line { Line::generate( { distro_x(gen), distro_y(gen), distro_z(gen) }, theta, phi) };
+        Line line { Line::generate( { distro_x(gen), distro_y(gen), simulation_plane_z_pos }, theta, phi) };
         bool coincidence { true };
         LineSegment refdet_path { setup.ref_detector()->intersection(line) };
         mc_events++;
@@ -167,9 +178,13 @@ double simulate_geometric_aperture(const DetectorSetup& setup, std::mt19937& gen
         }
     }
     double acceptance { static_cast<double>(detector_events) / mc_events };
-    std::cout << "events simulated:"<<mc_events<<"  events detected:"<<detector_events<<" acceptance:" << static_cast<double>(detector_events) / mc_events << "acc error: " << std::sqrt(detector_events) / mc_events << "\n";
-    std::cout << "effective area: "<<acceptance*100.<< " m^2\n";
-    return {};
+    std::cout << "events simulated:"<<mc_events<<"  events detected:"<<detector_events<<" acceptance:" << static_cast<double>(detector_events) / mc_events << " acceptance error: " << std::sqrt(detector_events) / mc_events << "\n";
+    
+    dimensions = { (bounds.second - bounds.first) };
+    const double simulation_area { 1e-6 * dimensions[0] * dimensions[1] };
+    double effective_area { acceptance * simulation_area };
+    std::cout << "effective area: " << effective_area << " +-" << std::sqrt(detector_events) / mc_events * simulation_area << " m^2\n";
+    return effective_area;
 }
 
 
