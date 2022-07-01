@@ -68,17 +68,19 @@ std::vector<Histogram> theta_scan(const DetectorSetup& setup, std::mt19937& gen,
         nr_bins,
         0., theta_max);
 
+    const auto bounds { setup.ref_detector()->bounding_box() };
+
     std::uniform_real_distribution<> distro_x {
-        setup.ref_detector()->bounding_box().first[0],
-        setup.ref_detector()->bounding_box().second[0],
+        bounds.first[0],
+        bounds.second[0],
     };
     std::uniform_real_distribution<> distro_y {
-        setup.ref_detector()->bounding_box().first[1],
-        setup.ref_detector()->bounding_box().second[1],
+        bounds.first[1],
+        bounds.second[1],
     };
     std::uniform_real_distribution<> distro_z {
-        setup.ref_detector()->bounding_box().first[2],
-        setup.ref_detector()->bounding_box().second[2]
+        bounds.first[2],
+        bounds.second[2]
     };
     std::uniform_real_distribution<> distro_phi(-pi(), pi());
 
@@ -198,19 +200,19 @@ std::array<std::array<double, THETA_BINS>, PHI_BINS> theta_phi_scan(const Detect
         return phi_theta_acceptance;
     }
 
+    const auto bounds { setup.ref_detector()->bounding_box() };
     std::uniform_real_distribution<> distro_x {
-        setup.ref_detector()->bounding_box().first[0],
-        setup.ref_detector()->bounding_box().second[0],
+        bounds.first[0],
+        bounds.second[0],
     };
     std::uniform_real_distribution<> distro_y {
-        setup.ref_detector()->bounding_box().first[1],
-        setup.ref_detector()->bounding_box().second[1],
+        bounds.first[1],
+        bounds.second[1],
     };
     std::uniform_real_distribution<> distro_z {
-        setup.ref_detector()->bounding_box().first[2],
-        setup.ref_detector()->bounding_box().second[2]
+        bounds.first[2],
+        bounds.second[2]
     };
-    //std::uniform_real_distribution<> distro_phi(-pi(), pi());
 
     const double phi_step { (phi_max - phi_min) / (PHI_BINS - 1) };
     const double theta_step { (theta_max - theta_min) / (THETA_BINS - 1) };
@@ -282,23 +284,24 @@ std::vector<Histogram> cosmic_simulation(const DetectorSetup& setup, std::mt1993
     Histogram theta_acc_hist("accepted_theta_distribution", nr_bins, 0., theta_max);
     Histogram phi_acc_hist("accepted_phi_distribution", nr_bins, -pi(), pi());
 
+    const auto bounds { setup.ref_detector()->bounding_box() };
     std::uniform_real_distribution<> distro_x {
-        setup.ref_detector()->bounding_box().first[0],
-        setup.ref_detector()->bounding_box().second[0],
+        bounds.first[0],
+        bounds.second[0],
     };
-    std::cout << "x-bounds: min=" << setup.ref_detector()->bounding_box().first[0] << " max=" << setup.ref_detector()->bounding_box().second[0] << "\n";
+    std::cout << "x-bounds: min=" << bounds.first[0] << " max=" << bounds.second[0] << "\n";
 
     std::uniform_real_distribution<> distro_y {
-        setup.ref_detector()->bounding_box().first[1],
-        setup.ref_detector()->bounding_box().second[1],
+        bounds.first[1],
+        bounds.second[1],
     };
-    std::cout << "y-bounds: min=" << setup.ref_detector()->bounding_box().first[1] << " max=" << setup.ref_detector()->bounding_box().second[1] << "\n";
+    std::cout << "y-bounds: min=" << bounds.first[1] << " max=" << bounds.second[1] << "\n";
 
     std::uniform_real_distribution<> distro_z {
-        setup.ref_detector()->bounding_box().first[2] + DEFAULT_EPSILON,
-        setup.ref_detector()->bounding_box().second[2] - DEFAULT_EPSILON
+        bounds.first[2],
+        bounds.second[2]
     };
-    std::cout << "z-bounds: min=" << setup.ref_detector()->bounding_box().first[2] << " max=" << setup.ref_detector()->bounding_box().second[2] << "\n";
+    std::cout << "z-bounds: min=" << bounds.first[2] << " max=" << bounds.second[2] << "\n";
 
     std::uniform_real_distribution<> distro_phi(-pi(), pi());
     SampledDistribution distro_theta(cos2cdf, 0.0, pi() / 2, 65536);
@@ -311,7 +314,7 @@ std::vector<Histogram> cosmic_simulation(const DetectorSetup& setup, std::mt1993
         Line line { Line::generate(
             { distro_x(gen),
                 distro_y(gen),
-                /*setup.ref_detector()->bounding_box().second[2]*/
+                /*bounds.second[2]*/
                 distro_z(gen) },
             theta, phi) };
 
@@ -321,7 +324,7 @@ std::vector<Histogram> cosmic_simulation(const DetectorSetup& setup, std::mt1993
             theta_hist.fill(theta);
             phi_hist.fill(phi);
             mc_events++;
-            if (mc_events % 100000 == 0)
+            if (mc_events % 100'000 == 0)
                 std::cout << mc_events << " MC events\n";
             coincidence = true;
         }
@@ -432,8 +435,8 @@ auto main() -> int
 
     // create 3d objects of type ExtrudedObject defined by the 2d outline,
     // a global position offset and a thickness
-    ExtrudedObject detector1 { half_size_detector_points, { 0., 0., 0. }, 10. };
-    ExtrudedObject detector2 { half_size_detector_points, { 0., 0., 160. }, 10. };
+    ExtrudedObject detector1 { large_paddle_points_lower, { 0., 0., 0. }, 8. };
+    ExtrudedObject detector2 { large_paddle_points_upper, { 0., 0., 200. }, 8. };
 
     // create 3d objects of type ExtrudedObject but using the constructor for generation of a 
     // circular shape specified by a global position offset, radius, thickness and an optional
