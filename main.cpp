@@ -325,7 +325,7 @@ std::vector<Histogram> cosmic_simulation(const DetectorSetup& setup, std::mt1993
             phi_hist.fill(phi);
             mc_events++;
             if (mc_events % 100'000 == 0)
-                std::cout << mc_events << " MC events\n";
+                std::cout << mc_events / 1000UL << "k MC events\n";
             coincidence = true;
         }
         for (auto detector { setup.detectors().cbegin() };
