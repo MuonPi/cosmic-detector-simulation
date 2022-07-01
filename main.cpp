@@ -122,6 +122,56 @@ std::vector<Histogram> theta_scan(const DetectorSetup& setup, std::mt19937& gen,
     return histos;
 }
 
+
+double simulate_geometric_aperture(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events)
+{
+    if (setup.ref_detector() == setup.detectors().end()) {
+        std::cerr << "no reference detector defined in DetectorSetup!\n";
+        return {};
+    }
+
+    std::uniform_real_distribution<> distro_x {
+        -5000.,
+        5000.,
+    };
+    std::uniform_real_distribution<> distro_y {
+        -5000.,
+        5000.,
+    };
+    std::uniform_real_distribution<> distro_z {
+        setup.ref_detector()->bounding_box().first[2],
+        setup.ref_detector()->bounding_box().second[2]
+    };
+    std::uniform_real_distribution<> distro_phi(-pi(), pi());
+
+    std::size_t mc_events { 0 };
+    std::size_t detector_events { 0 };
+    for (std::size_t n = 0; n < nr_events; ++n) {
+        Line line { Line::generate( { distro_x(gen), distro_y(gen), distro_z(gen) }, 0., 0.) };
+        bool coincidence { true };
+        LineSegment refdet_path { setup.ref_detector()->intersection(line) };
+        mc_events++;
+        for (auto detector { setup.detectors().cbegin() };
+             detector != setup.detectors().end();
+             ++detector)
+        {
+            LineSegment det_path { detector->intersection(line) };
+            if (det_path.length() < DEFAULT_EPSILON) {
+                coincidence = false;
+            }
+        }
+        if (coincidence) {
+                //std::cout << n << " " << std::setw(2) << toDeg(theta) << " " << toDeg(phi) << " " << det1_path.length() << " " << det2_path.length() << "\n";
+            detector_events++;
+        }
+    }
+    double acceptance { static_cast<double>(detector_events) / mc_events };
+    std::cout << "events simulated:"<<mc_events<<"  events detected:"<<detector_events<<" acceptance:" << static_cast<double>(detector_events) / mc_events << "acc error: " << std::sqrt(detector_events) / mc_events << "\n";
+    std::cout << "effective area: "<<acceptance*100.<< " m^2\n";
+    return {};
+}
+
+
 template <int PHI_BINS = 256, int THETA_BINS = 256>
 std::array<std::array<double, THETA_BINS>, PHI_BINS> theta_phi_scan(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta_min, double theta_max, double phi_min, double phi_max)
 {
@@ -371,6 +421,9 @@ auto main() -> int
 
     // construct a detector setup with the two detectors
     DetectorSetup setup { { detector1, detector2 } };
+
+    // simulate the effective area (geometric aperture) of the detector system
+    [[maybe_unused]] const double effective_area_sqm { simulate_geometric_aperture(setup, gen, nr_events*100) };
 
     // uncomment the following block to calculate the double differential acceptance
     // as function of phi and theta
