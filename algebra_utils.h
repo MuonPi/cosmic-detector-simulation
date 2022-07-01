@@ -9,6 +9,7 @@
 
 constexpr double DEFAULT_EPSILON { 1e-9 };
 constexpr double pi() { return std::acos(-1); }
+constexpr double twopi() { return pi() * 2; }
 constexpr double sqrt2 { std::sqrt(2.) };
 
 std::ostream& operator<<(std::ostream& os, const std::valarray<double>& p);

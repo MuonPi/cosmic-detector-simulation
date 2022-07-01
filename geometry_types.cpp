@@ -73,6 +73,22 @@ ExtrudedObject::ExtrudedObject(const std::vector<Point>& vertices, const Point& 
     m_planes = getPlanes();
 }
 
+ExtrudedObject::ExtrudedObject(const Point& position, double radius, double thickness, std::size_t nr_vertices)
+    : m_position(position)
+    , m_thickness(thickness)
+{
+    for ( std::size_t n { 0 }; n < nr_vertices; ++n ) {
+        const double angle { twopi() * n / nr_vertices };
+        Point p {
+            m_position[0] + radius * std::cos(angle),
+            m_position[1] + radius * std::sin(angle)
+        };
+        m_vertices.emplace_back(std::move(p));
+    }
+    m_planes = getPlanes();
+}
+
+
 auto ExtrudedObject::contains(const Point& point) const -> bool
 {
     for (const auto& plane : m_planes) {

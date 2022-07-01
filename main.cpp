@@ -417,14 +417,20 @@ auto main() -> int
 
     // create 3d objects of type ExtrudedObject defined by the 2d outline,
     // a global position offset and a thickness
-    ExtrudedObject detector1 { large_paddle_points_lower, { 0., 0., 0. }, 10. };
-    ExtrudedObject detector2 { large_paddle_points_upper, { 0., 0., 200. }, 10. };
+    ExtrudedObject detector1 { half_size_detector_points, { 0., 0., 0. }, 10. };
+    ExtrudedObject detector2 { half_size_detector_points, { 0., 0., 160. }, 10. };
+
+    // create 3d objects of type ExtrudedObject but using the constructor for generation of a 
+    // circular shape specified by a global position offset, radius, thickness and an optional
+    // number of vertex points to generate the circle
+    ExtrudedObject detector3 { { 0., 0., 0. }, 50., 10. };
+    ExtrudedObject detector4 { { 0., 0., 100. }, 50., 10. };
 
     // construct a detector setup with the two detectors
     DetectorSetup setup { { detector1, detector2 } };
 
     // simulate the effective area (geometric aperture) at theta=0 of the detector system
-    [[maybe_unused]] const double effective_area_sqm { simulate_geometric_aperture(setup, gen, nr_events*100) };
+    [[maybe_unused]] const double effective_area_sqm { simulate_geometric_aperture(setup, gen, nr_events) };
 
     // uncomment the following block to calculate the double differential acceptance
     // as function of phi and theta
