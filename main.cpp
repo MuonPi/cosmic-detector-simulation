@@ -429,7 +429,7 @@ auto main() -> int
     // uncomment the following block to calculate the double differential acceptance
     // as function of phi and theta
 /*
-    auto acceptance_phi_theta = theta_phi_scan<361, 46>(setup, gen, nr_events, 0., theta_max, -pi(), pi());
+    [[maybe_unused]] const auto acceptance_phi_theta = theta_phi_scan<361, 46>(setup, gen, nr_events, 0., theta_max, -pi(), pi());
 */
 
     // initialize the histogram vector
