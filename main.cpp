@@ -123,7 +123,7 @@ std::vector<Histogram> theta_scan(const DetectorSetup& setup, std::mt19937& gen,
 }
 
 
-double simulate_geometric_aperture(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events)
+double simulate_geometric_aperture(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta = 0.)
 {
     if (setup.ref_detector() == setup.detectors().end()) {
         std::cerr << "no reference detector defined in DetectorSetup!\n";
@@ -147,7 +147,8 @@ double simulate_geometric_aperture(const DetectorSetup& setup, std::mt19937& gen
     std::size_t mc_events { 0 };
     std::size_t detector_events { 0 };
     for (std::size_t n = 0; n < nr_events; ++n) {
-        Line line { Line::generate( { distro_x(gen), distro_y(gen), distro_z(gen) }, 0., 0.) };
+        const double phi { (inEpsilon(theta))?0.:distro_phi(gen) };
+        Line line { Line::generate( { distro_x(gen), distro_y(gen), distro_z(gen) }, theta, phi) };
         bool coincidence { true };
         LineSegment refdet_path { setup.ref_detector()->intersection(line) };
         mc_events++;
