@@ -96,6 +96,14 @@ ExtrudedObject::ExtrudedObject(const Point& position, double radius, double thic
     m_planes = getPlanes();
 }
 
+const auto ExtrudedObject::position() const -> Point {
+    return m_position;
+}
+
+auto ExtrudedObject::thickness() const -> double {
+    return m_thickness;
+}
+
 
 auto ExtrudedObject::contains(const Point& point) const -> bool
 {

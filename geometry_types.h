@@ -41,6 +41,8 @@ public:
     ExtrudedObject() = default;
     ExtrudedObject(const std::vector<Point>& vertices, const Point& position, double thickness);
     ExtrudedObject(const Point& position, double radius, double thickness, std::size_t nr_vertices = 32);
+    const auto position() const -> Point;
+    auto thickness() const -> double;
     auto contains(const Point& point) const -> bool;
     auto intersection(const Line& path) const -> LineSegment;
     auto bounding_box() const -> std::pair<Point, Point>;
