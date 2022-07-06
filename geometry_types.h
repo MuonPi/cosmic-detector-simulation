@@ -31,6 +31,7 @@ struct Plane {
     struct no_intersection : std::runtime_error { using std::runtime_error::runtime_error; };
     auto operator()(double t, double s) const -> Point;
     auto normal() const -> Vector;
+    static auto fromNormalVector(const Point& ref_point, const Vector& vec) -> Plane;
     auto distance(const Point& point) const -> double;
     auto intersection(const Line& line) const -> Point;
 };

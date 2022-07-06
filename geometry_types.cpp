@@ -37,6 +37,14 @@ auto Plane::normal() const -> Vector
     return normalvec / veclength;
 }
 
+auto Plane::fromNormalVector(const Point& ref_point, const Vector& vec) -> Plane
+{
+    //double k { (vec * ref_point).sum() };
+    Vector normalvec { vec/norm(vec) };
+    Plane plane { ref_point, Vector{ normalvec[2], 0., -normalvec[0] }, Vector{ 0., normalvec[2], -normalvec[1] } };
+    return plane;
+}
+
 auto Plane::distance(const Point& point) const -> double
 {
     return ((point - p) * normal()).sum();
