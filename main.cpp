@@ -271,13 +271,15 @@ std::array<std::array<double, THETA_BINS>, PHI_BINS> theta_phi_scan(const Detect
  * @note In case of an error, the returned histogram vector is empty
  * @note The setup object must have the ref_detector iterator set to any valid detector it contains.
 */
-std::vector<Histogram> cosmic_simulation(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta_max, std::size_t nr_bins)
+std::vector<Histogram> cosmic_simulation(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta_max, std::size_t nr_bins, int coinc_level = -1)
 {
     std::vector<Histogram> histos {};
     if (setup.ref_detector() == setup.detectors().end()) {
         std::cerr << "no reference detector defined in DetectorSetup!\n";
         return histos;
     }
+
+    if (coinc_level < 0) coinc_level = setup.detectors().size();
 
     Histogram theta_hist("theta_distribution", nr_bins, 0., theta_max);
     Histogram phi_hist("phi_distribution", nr_bins, -pi(), pi());
@@ -314,19 +316,19 @@ std::vector<Histogram> cosmic_simulation(const DetectorSetup& setup, std::mt1993
         Line line { Line::generate(
             { distro_x(gen),
                 distro_y(gen),
-                /*bounds.second[2]*/
+                /*bounds.first[2]*/
                 distro_z(gen) },
             theta, phi) };
 
-        bool coincidence { false };
+        unsigned int coincidence { 0 };
         LineSegment refdet_path { setup.ref_detector()->intersection(line) };
-        if (refdet_path.length() > DEFAULT_EPSILON) {
+        if (refdet_path.length() > 0.) {
             theta_hist.fill(theta);
             phi_hist.fill(phi);
             mc_events++;
             if (mc_events % 100'000 == 0)
                 std::cout << mc_events / 1000UL << "k MC events\n";
-            coincidence = true;
+            coincidence++;
         }
         for (auto detector { setup.detectors().cbegin() };
              detector != setup.detectors().end();
@@ -334,11 +336,11 @@ std::vector<Histogram> cosmic_simulation(const DetectorSetup& setup, std::mt1993
             if (detector == setup.ref_detector())
                 continue;
             LineSegment det_path { detector->intersection(line) };
-            if (det_path.length() < DEFAULT_EPSILON) {
-                coincidence = false;
+            if (det_path.length() > 0.) {
+                coincidence++;
             }
         }
-        if (coincidence) {
+        if (coincidence >= coinc_level) {
             //std::cout << n << " " << std::setw(2) << toDeg(theta) << " " << toDeg(phi) << " " << det1_path.length() << " " << det2_path.length() << "\n";
             theta_acc_hist.fill(theta);
             phi_acc_hist.fill(phi);
@@ -466,7 +468,7 @@ auto main() -> int
     // now, run the full simulation and append the resulting histograms
     // to the already existing histogram vector
     Append(histos,
-        cosmic_simulation(setup, gen, nr_events * nr_bins, theta_max, nr_bins));
+        cosmic_simulation(setup, gen, nr_events * nr_bins, theta_max, nr_bins, 2));
 
     // export each histogram into a separate file (human readable ASCII format)
     for (auto histo : histos) {
