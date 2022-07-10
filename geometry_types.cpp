@@ -49,7 +49,11 @@ auto Plane::fromNormalVector(const Point& ref_point, const Vector& vec) -> Plane
 {
     //double k { (vec * ref_point).sum() };
     Vector normalvec { vec/norm(vec) };
-    Plane plane { ref_point, Vector{ normalvec[2], 0., -normalvec[0] }, Vector{ 0., normalvec[2], -normalvec[1] } };
+    Plane plane {
+        ref_point,
+        Vector{ normalvec[2], 0., -normalvec[0] },
+        Vector{ 0., normalvec[2], -normalvec[1] }
+    };
     return plane;
 }
 
@@ -80,6 +84,14 @@ auto Plane::intersection(const Line& line) const -> Point
     double t { v1 / v2 };
     return line(t);
 }
+
+void Plane::rotate(const Vector& rot_axis, double rot_angle)
+{
+    Line normalvec { p, normal() };
+    normalvec.rotate(rot_axis, rot_angle);
+    *this = { Plane::fromNormalVector(p, normalvec.q) };
+}
+
 
 ExtrudedObject::ExtrudedObject(const std::vector<Point>& vertices, const Point& position, double thickness)
     : m_vertices(vertices)

@@ -60,6 +60,7 @@ struct Plane {
     static auto fromNormalVector(const Point& ref_point, const Vector& vec) -> Plane;
     auto distance(const Point& point) const -> double;
     auto intersection(const Line& line) const -> Point;
+    void rotate(const Vector& rot_axis, double rot_angle);
 };
 
 class ExtrudedObject {
