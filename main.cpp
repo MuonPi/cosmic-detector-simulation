@@ -263,11 +263,11 @@ std::array<std::array<double, THETA_BINS>, PHI_BINS> theta_phi_scan(const Detect
  * This function does a full Monte-Carlo simulated evaluation of particle hits for a given detector setup. Tracks are distributed as follows:
  * - phi: uniformly distributed in -pi..pi
  * - theta: distributed in 0..pi/2 according to the standard model for muons: ~cos^n(theta) with n=2
- * @arg setup DetectorSetup object containing the detector definitions
- * @arg gen random number generator (Mersenne-Twister engine of type std::mt19937)
- * @arg nr_events The total number of tracks to be generated. This is not identical to the number of MC events (=events having a hit in the reference detector)
- * @arg theta_max the maximum zenith angle theta up to which the result histograms are scaled. Note, that the tracks are generated within the full theta range (according to the underlaying distribution) independent of this parameter.
- * @arg nr_bins The number of bins in the resulting histograms
+ * @param setup DetectorSetup object containing the detector definitions
+ * @param gen random number generator (Mersenne-Twister engine of type std::mt19937)
+ * @param nr_events The total number of tracks to be generated. This is not identical to the number of MC events (=events having a hit in the reference detector)
+ * @param theta_max the maximum zenith angle theta up to which the result histograms are scaled. Note, that the tracks are generated within the full theta range (according to the underlaying distribution) independent of this parameter.
+ * @param nr_bins The number of bins in the resulting histograms
  * @return A std::vector of Histogram objects containing the resulting distributions for theta ("theta_distribution"), accepted theta ("accepted_theta_distribution"), phi ("phi_distribution") and ("accepted_phi_distribution").
  * @note In case of an error, the returned histogram vector is empty
  * @note The setup object must have the ref_detector iterator set to any valid detector it contains.
