@@ -14,6 +14,14 @@ auto Line::distance(const Point& point) const -> double
     return norm((point - p) - q * q * (point - p));
 }
 
+void Line::rotate(const Vector& rot_axis, double rot_angle)
+{
+    const Vector k { rot_axis/norm(rot_axis) };
+    const double c { std::cos(rot_angle) };
+    const double s { std::sin(rot_angle) };
+    q = { q * c + cross_product(k,q) * s + k*k*q*(1. - c) };
+}
+
 auto LineSegment::length() const -> double
 {
     return norm(line(t_start) - line(t_end));
