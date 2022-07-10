@@ -138,13 +138,12 @@ auto ExtrudedObject::intersection(const Line& path) const -> LineSegment
         hitpoints.push_back(std::move(hitpoint));
     }
     if (hitpoints.empty()) {
-        //std::cerr<<"Error in ExtrudedObject::intersection(const Line&): no intersections with volume found!\n";
+        // no intersections with volume found
         return LineSegment {};
     }
     auto it = hitpoints.begin();
     while (it != hitpoints.end()) {
         if (contains(*it)) {
-            //std::cout<<"found intersection point "<<*it<<"\n";
             ++it;
         } else
             it = hitpoints.erase(it);
@@ -159,7 +158,6 @@ auto ExtrudedObject::intersection(const Line& path) const -> LineSegment
                 } else
                     ++it2;
             }
-            //std::cout<<"found intersection point "<<*it<<"\n";
             ++it;
         }
     }
@@ -169,7 +167,7 @@ auto ExtrudedObject::intersection(const Line& path) const -> LineSegment
             0., 1.
         };
     } else if (hitpoints.size() > 2) {
-        //        std::cerr<<"ExtrudedObject::intersection(const Line&): strange nr of intersection points: " << hitpoints.size() << "\n";
+        std::cerr<<"ExtrudedObject::intersection(const Line&): strange nr of intersection points: " << hitpoints.size() << "\n";
     }
     return LineSegment {};
 }

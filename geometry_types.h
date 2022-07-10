@@ -8,12 +8,38 @@
 
 #include "algebra_types.h"
 
+/** @brief Line - struct representing a geometric line in R^n
+ * The line is comprised of a reference point p and a direction vector q 
+*/
 struct Line {
     Point p {};
     Vector q {};
+    
+    /** @brief evaluate the locus of the line at parameter value t
+    * @param t scalar line parameter. t=0 for ref point
+    * @return the locus of the line at the selected t-parameter
+    */
     auto operator()(double t) const -> Point;
+
+    /** @brief calculate the distance of a given point to the line
+    * @param point the point which distance to the line shall be calculated
+    * @return norm-distance of the point to the line, i.e. unsigned distance
+    */
     auto distance(const Point& point) const -> double;
+
+    /** @brief generate a line object from given ref point and theta, phi angles
+    * @param p0 reference point
+    * @param theta zenit angle
+    * @param phi azimuthal angle
+    * @return line object
+    */
     static auto generate(Point p0, double theta, double phi) -> Line;
+    
+    /** @brief rotate the line about given axis by given angle
+    * @param rot_axis the axis about which the rotation is performed
+    * @param rot_angle the rotation angle (in radians)
+    */
+    void rotate(const Vector& rot_axis, double rot_angle);
 };
 
 struct LineSegment {

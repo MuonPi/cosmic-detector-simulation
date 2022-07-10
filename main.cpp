@@ -45,12 +45,12 @@ void Append(std::vector<T>& a, const std::vector<T>& b)
  * This function does Monte-Carlo simulated evaluation of particle hits for a given detector setup iterating over the specified theta angular range. Tracks are distributed as follows:
  * - phi: uniformly distributed in -pi..pi
  * - theta: iterating from theta_min to theta_max in nr_bins steps
- * @arg setup DetectorSetup object containing the detector definitions
- * @arg gen random number generator (Mersenne-Twister engine of type std::mt19937)
- * @arg nr_events The number of tracks to be generated per theta bin. This is not identical to the number of MC events (=events having a hit in the reference detector)
- * @arg theta_min the minimum zenith angle theta from which events are generated
- * @arg theta_max the maximum zenith angle theta up to which events are generated
- * @arg nr_bins The number of bins in the resulting acceptance histogram
+ * @param setup DetectorSetup object containing the detector definitions
+ * @param gen random number generator (Mersenne-Twister engine of type std::mt19937)
+ * @param nr_events The number of tracks to be generated per theta bin. This is not identical to the number of MC events (=events having a hit in the reference detector)
+ * @param theta_min the minimum zenith angle theta from which events are generated
+ * @param theta_max the maximum zenith angle theta up to which events are generated
+ * @param nr_bins The number of bins in the resulting acceptance histogram
  * @return A std::vector of Histogram objects containing the resulting distributions. Currently, only the angular acceptance (detection efficiency vs. theta) is provided
  * @note In case of an error, the returned histogram vector is empty
  * @note The setup object must have the ref_detector iterator set to any valid detector it contains.
@@ -188,7 +188,6 @@ double simulate_geometric_aperture(const DetectorSetup& setup, std::mt19937& gen
     std::cout << "effective area: " << effective_area << " +-" << std::sqrt(detector_events) / mc_events * simulation_area << " m^2\n";
     return effective_area;
 }
-
 
 template <int PHI_BINS = 256, int THETA_BINS = 256>
 std::array<std::array<double, THETA_BINS>, PHI_BINS> theta_phi_scan(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta_min, double theta_max, double phi_min, double phi_max)
