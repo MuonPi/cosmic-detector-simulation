@@ -444,8 +444,8 @@ auto main() -> int
     // create 3d objects of type ExtrudedObject but using the constructor for generation of a 
     // circular shape specified by a global position offset, radius, thickness and an optional
     // number of vertex points to generate the circle
-    ExtrudedObject detector3 { { 0., 0., 0. }, 50., 10. };
-    ExtrudedObject detector4 { { 0., 0., 100. }, 50., 10. };
+    ExtrudedObject round_detector1 { { 0., 0., 0. }, 50., 10. };
+    ExtrudedObject round_detector2 { { 0., 0., 100. }, 50., 10. };
 
     // construct a detector setup with the two detectors
     DetectorSetup setup { { detector1, detector2 } };
