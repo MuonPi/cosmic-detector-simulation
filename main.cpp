@@ -85,8 +85,10 @@ std::vector<Histogram> theta_scan(const DetectorSetup& setup, std::mt19937& gen,
     std::uniform_real_distribution<> distro_phi(-pi(), pi());
 
     const double theta_step { (theta_max - theta_min) / (nr_bins - 1) };
+    std::cout << "theta step: " << theta_step <<" rad = " << toDeg(theta_step) << " deg\n";
     std::cout << "#theta acceptance acceptance_error\n";
-    for (double theta { theta_min }; theta < theta_max; theta += theta_step) {
+    double theta { theta_min };
+    for (size_t bin { 0 }; bin < nr_bins; ++bin) {
         std::size_t mc_events { 0 };
         std::size_t detector_events { 0 };
         for (std::size_t n = 0; n < nr_events; ++n) {
@@ -119,11 +121,11 @@ std::vector<Histogram> theta_scan(const DetectorSetup& setup, std::mt19937& gen,
         //        acc_hist.fill(theta, detector_events);
         acc_hist.fill(theta, static_cast<double>(detector_events) / mc_events);
         std::cout << std::flush;
+        theta += theta_step;
     }
     histos.push_back(acc_hist);
     return histos;
 }
-
 
 double simulate_geometric_aperture(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta = 0.)
 {
@@ -467,7 +469,7 @@ auto main() -> int
     // now, run the full simulation and append the resulting histograms
     // to the already existing histogram vector
     Append(histos,
-        cosmic_simulation(setup, gen, nr_events * nr_bins, theta_max, nr_bins, 2));
+        cosmic_simulation(setup, gen, nr_events * nr_bins, theta_max, nr_bins));
 
     // export each histogram into a separate file (human readable ASCII format)
     for (auto histo : histos) {
