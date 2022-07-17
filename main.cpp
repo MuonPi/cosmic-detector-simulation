@@ -408,12 +408,12 @@ auto main() -> int
 
     // definition of the MuonPi half-size detector
     const std::vector<Point> half_size_detector_points {
-        { -126.5, -20. },
-        { -91.5, -62.5 },
+        { -130., -20. },
+        { -60., -62.5 },
         { 0., -62.5 },
         { 0., 62.5 },
-        { -91.5, 62.5 },
-        { -126.5, 20. }
+        { -60., 62.5 },
+        { -130., 20. }
     };
 
     // definition of the MuonPi hexagon (small-size) detector
