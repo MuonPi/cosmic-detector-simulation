@@ -14,8 +14,8 @@ namespace R3 {
         const Vector Y { 0., 1., 0. };
         const Vector Z { 0., 0., 1. };
     }
-    const matrix2d<double> Identity { 3, 
-        { 
+    const matrix2d<double> Identity { 3,
+        {
             1.,0.,0.,
             0.,1.,0.,
             0.,0.,1.

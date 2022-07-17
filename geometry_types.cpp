@@ -116,7 +116,6 @@ auto ExtrudedObject::thickness() const -> double {
     return m_thickness;
 }
 
-
 auto ExtrudedObject::contains(const Point& point) const -> bool
 {
     for (const auto& plane : m_planes) {
