@@ -24,8 +24,8 @@ auto norm(const Vector& vec) -> double
 
 auto cross_product(const Vector& a, const Vector& b) -> Vector
 {
-    //    static_assert(a.size() == 3);
-    //    static_assert(b.size() == 3);
+    assert(a.size() == 3);
+    assert(b.size() == 3);
     return { a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2],
         a[0] * b[1] - a[1] * b[0] };
 }
