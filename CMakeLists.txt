@@ -23,6 +23,7 @@ set(SOURCE_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/algebra_utils.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/geometry_types.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/histogram.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/detector_setup.cpp"
 )
 
 set(HEADER_FILES

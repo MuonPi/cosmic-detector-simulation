@@ -75,13 +75,14 @@ public:
     ExtrudedObject(const std::vector<Point>& vertices, const Point& position, double thickness);
     ExtrudedObject(const Point& position, double radius, double thickness, std::size_t nr_vertices = 32);
     const auto position() const -> Point;
+    void set_position(const Point& new_pos);
     auto thickness() const -> double;
     auto contains(const Point& point) const -> bool;
     auto intersection(const Line& path) const -> LineSegment;
     auto bounding_box() const -> std::pair<Point, Point>;
-    void addRotation(const Vector& rot_axis, double rot_angle);
-    auto getRotationMatrix() -> const matrix2d<double>&;
-    void resetRotationMatrix();
+    void add_rotation(const Vector& rot_axis, double rot_angle);
+    auto get_rotation_matrix() -> const matrix2d<double>&;
+    void reset_rotation_matrix();
 
 private:
     std::vector<Point> m_vertices {};

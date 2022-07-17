@@ -103,13 +103,14 @@ ExtrudedObject::ExtrudedObject(const Point& position, double radius, double thic
     m_planes = getPlanes();
 }
 
-void ExtrudedObject::resetRotationMatrix()
-{
-    m_rotation_matrix = R3::Identity;
-}
-
 const auto ExtrudedObject::position() const -> Point {
     return m_position;
+}
+
+void ExtrudedObject::set_position(const Point& new_pos)
+{
+    m_position = new_pos;
+    //m_planes = getPlanes();
 }
 
 auto ExtrudedObject::thickness() const -> double {
@@ -256,10 +257,10 @@ auto ExtrudedObject::bounding_box() const -> std::pair<Point, Point>
     return std::make_pair<Point, Point>(std::move(min_coordinates), std::move(max_coordinates));
 }
 
-void ExtrudedObject::addRotation(const Vector& rot_axis, double rot_angle)
+void ExtrudedObject::add_rotation(const Vector& rot_axis, double rot_angle)
 {
-    std::cout<<"matrix before rot:\n";
-    std::cout<<m_rotation_matrix;
+    //std::cout<<"matrix before rot:\n";
+    //std::cout<<m_rotation_matrix;
     matrix2d<double> K { 3,
         {
             0., -rot_axis[2], rot_axis[1],
@@ -270,12 +271,17 @@ void ExtrudedObject::addRotation(const Vector& rot_axis, double rot_angle)
 
     matrix2d R { R3::Identity + std::sin(rot_angle)*K + (1.-std::cos(rot_angle))*(K*K) };
     m_rotation_matrix = m_rotation_matrix * R;
-    std::cout<<"matrix after rot:\n";
-    std::cout<<m_rotation_matrix;
+    //std::cout<<"matrix after rot:\n";
+    //std::cout<<m_rotation_matrix;
     m_planes = getPlanes();
 }
 
-auto ExtrudedObject::getRotationMatrix() -> const matrix2d<double>&
+auto ExtrudedObject::get_rotation_matrix() -> const matrix2d<double>&
 {
     return m_rotation_matrix;
+}
+
+void ExtrudedObject::reset_rotation_matrix()
+{
+    m_rotation_matrix = R3::Identity;
 }
