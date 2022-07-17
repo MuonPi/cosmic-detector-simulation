@@ -317,18 +317,16 @@ std::vector<Histogram> cosmic_simulation(const DetectorSetup& setup, std::mt1993
     for (std::size_t n = 0; n < nr_events; ++n) {
         const double theta { distro_theta(gen) };
         const double phi { distro_phi(gen) };
-        Line line { Line::generate(
-            { distro_x(gen),
-                distro_y(gen),
-                /*bounds.first[2]*/
-                distro_z(gen) },
-            theta, phi) };
+        Line line {
+            Line::generate( { distro_x(gen), distro_y(gen), distro_z(gen) }, theta, phi)
+        };
+
+        theta_hist.fill(theta);
+        phi_hist.fill(phi);
 
         unsigned int coincidence { 0 };
         LineSegment refdet_path { setup.ref_detector()->intersection(line) };
         if (refdet_path.length() > 0.) {
-            theta_hist.fill(theta);
-            phi_hist.fill(phi);
             mc_events++;
             if (mc_events % 100'000 == 0)
                 std::cout << mc_events / 1000UL << "k MC events\n";
