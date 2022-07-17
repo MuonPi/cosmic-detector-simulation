@@ -1,5 +1,6 @@
 #include "geometry_types.h"
 #include "algebra_utils.h"
+#include "matrix.h"
 
 #include <iostream>
 #include <limits>

@@ -79,6 +79,6 @@ private:
     Point m_position { 0., 0., 0. };
     double m_thickness { 0. };
     std::vector<Plane> m_planes {};
-
+    matrix2d<double> m_rotation_matrix { R3::Identity };
     auto getPlanes() const -> std::vector<Plane>;
 };
