@@ -39,6 +39,7 @@ bool inEpsilon(double value, double eps)
 
 bool isFuzzySame(const std::valarray<double>& a, const std::valarray<double>& b)
 {
+    assert(a.size() == b.size());
     return inEpsilon(norm(a - b));
 }
 

@@ -270,6 +270,7 @@ std::array<std::array<double, THETA_BINS>, PHI_BINS> theta_phi_scan(const Detect
  * @param nr_events The total number of tracks to be generated. This is not identical to the number of MC events (=events having a hit in the reference detector)
  * @param theta_max the maximum zenith angle theta up to which the result histograms are scaled. Note, that the tracks are generated within the full theta range (according to the underlaying distribution) independent of this parameter.
  * @param nr_bins The number of bins in the resulting histograms
+ * @param coinc_level the number of detectors which have to be crossed by a track in order to assert a coincidence event
  * @return A std::vector of Histogram objects containing the resulting distributions for theta ("theta_distribution"), accepted theta ("accepted_theta_distribution"), phi ("phi_distribution") and ("accepted_phi_distribution").
  * @note In case of an error, the returned histogram vector is empty
  * @note The setup object must have the ref_detector iterator set to any valid detector it contains.

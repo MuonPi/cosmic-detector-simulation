@@ -13,11 +13,11 @@ constexpr double pi() { return std::acos(-1); }
 constexpr double twopi() { return pi() * 2; }
 constexpr double sqrt2 { std::sqrt(2.) };
 
-std::ostream& operator<<(std::ostream& os, const std::valarray<double>& p);
 auto norm(const Vector& vec) -> double;
 auto cross_product(const Vector& a, const Vector& b) -> Vector;
 bool inEpsilon(double value, double eps = DEFAULT_EPSILON);
 bool isFuzzySame(const std::valarray<double>& a, const std::valarray<double>& b);
 Point rotate(const Point& p, const Vector& rot_axis, double rot_angle);
 Vector operator*(const matrix2d<double>& lhs, const Vector& rhs);
+std::ostream& operator<<(std::ostream& os, const std::valarray<double>& p);
 std::ostream& operator<<(std::ostream& os, const matrix2d<double>& m);
