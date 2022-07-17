@@ -177,7 +177,9 @@ double simulate_geometric_aperture(const DetectorSetup& setup, std::mt19937& gen
             }
         }
         if (coincidence) {
-                //std::cout << n << " " << std::setw(2) << toDeg(theta) << " " << toDeg(phi) << " " << det1_path.length() << " " << det2_path.length() << "\n";
+/*
+            std::cout << "coincidence detected n="<< n << " " << std::setw(2) << toDeg(theta) << " " << toDeg(phi) << "\n";
+*/
             detector_events++;
         }
     }

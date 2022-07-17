@@ -51,16 +51,22 @@ struct LineSegment {
 
 struct Plane {
     Point p {};
-    Vector q {};
-    Vector r {};
+    Vector normal {};
+    //Vector q {};
+    //Vector r {};
     struct no_normal : std::runtime_error { using std::runtime_error::runtime_error; };
     struct no_intersection : std::runtime_error { using std::runtime_error::runtime_error; };
     auto operator()(double t, double s) const -> Point;
-    auto normal() const -> Vector;
-    static auto fromNormalVector(const Point& ref_point, const Vector& vec) -> Plane;
     auto distance(const Point& point) const -> double;
     auto intersection(const Line& line) const -> Point;
+
+    /** @brief Rotate the plane about given axis by given angle.
+     * @param rot_axis the axis about which the rotation is performed
+     * @param rot_angle the rotation angle (in radians)
+     * @note Rotates the normal vector of the plane. The reference point is preserved.
+    */
     void rotate(const Vector& rot_axis, double rot_angle);
+    void rotate(const matrix2d<double>& rot_matrix);
 };
 
 class ExtrudedObject {
@@ -73,6 +79,9 @@ public:
     auto contains(const Point& point) const -> bool;
     auto intersection(const Line& path) const -> LineSegment;
     auto bounding_box() const -> std::pair<Point, Point>;
+    void addRotation(const Vector& rot_axis, double rot_angle);
+    auto getRotationMatrix() -> const matrix2d<double>&;
+    void resetRotationMatrix();
 
 private:
     std::vector<Point> m_vertices {};
