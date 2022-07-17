@@ -47,7 +47,7 @@ Point rotate(const Point& p, const Vector& rot_axis, double rot_angle)
     const Vector k { rot_axis/norm(rot_axis) };
     const double c { std::cos(rot_angle) };
     const double s { std::sin(rot_angle) };
-    return { p * c + cross_product(k,p) * s + (1. - c)*cross_product(k,cross_product(k,p)) };
+    return { p + s * cross_product(k,p) + (1. - c) * cross_product(k, cross_product(k,p) ) };
 }
 
 Vector operator*(const matrix2d<double>& lhs, const Vector& rhs)
