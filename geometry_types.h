@@ -44,13 +44,13 @@ struct Line {
     void rotate(const Vector& rot_axis, double rot_angle);
 };
 
-/** @brief LineSegment - struct representing a geometric line segment in R^n 
+/** @brief LineSegment - struct representing a geometric line segment in R^n
  * with start and end points indicated by t_start and t_end parameter
  */
 struct LineSegment {
-    Line line {};
-    double t_start {};
-    double t_end {};
+    Line line {}; //<! the line defining the segment
+    double t_start {}; //<! the line parameter t for the start point of the segment
+    double t_end {}; //<! the line parameter t for the end point of the segment
     auto length() const -> double;
 };
 
@@ -58,8 +58,8 @@ struct LineSegment {
  * The plane is comprised of a reference point p and a normal vector.
  */
 struct Plane {
-    Point p {};
-    Vector normal {};
+    Point p {}; //<! the reference point
+    Vector normal {}; //<! the normal vector
     struct no_normal : std::runtime_error { using std::runtime_error::runtime_error; };
     struct no_intersection : std::runtime_error { using std::runtime_error::runtime_error; };
     auto distance(const Point& point) const -> double;
@@ -78,6 +78,10 @@ struct Plane {
     void rotate(const matrix2d<double>& rot_matrix);
 };
 
+/** @brief ExtrudedObject - class representing a geometric extruded form in R3.
+ * The object is defined by a series of 2-dimensional vertex points as outline and a thickness.
+ * A global position (the detector's reference point) and a rotation in the local coordinate system around this reference point can be set.
+ */
 class ExtrudedObject {
 public:
     ExtrudedObject() = default;
@@ -94,10 +98,10 @@ public:
     void reset_rotation_matrix();
 
 private:
-    std::vector<Point> m_vertices {};
-    Point m_position { 0., 0., 0. };
-    double m_thickness { 0. };
-    std::vector<Plane> m_planes {};
-    matrix2d<double> m_rotation_matrix { R3::Identity };
+    std::vector<Point> m_vertices {}; //<! the vector of 2d vertices defining the object's outline
+    Point m_position { 0., 0., 0. }; //<! the global position and reference point of the object
+    double m_thickness { 0. }; //<! the thickness (extrusion) of the object
+    std::vector<Plane> m_planes {}; //<! a vector of all surface planes of the object
+    matrix2d<double> m_rotation_matrix { R3::Identity }; //<! the 3x3 rotation matrix
     auto getPlanes() const -> std::vector<Plane>;
 };
