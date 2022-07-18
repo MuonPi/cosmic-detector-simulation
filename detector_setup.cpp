@@ -14,7 +14,7 @@ DetectorSetup::DetectorSetup(const std::vector<ExtrudedObject>& detectorlist)
 
 void DetectorSetup::rotate(const Vector& rot_axis, double rot_angle)
 {
-    for ( auto& detector : m_detectors ) {
+    for (auto& detector : m_detectors) {
         Point pos { detector.position() };
         pos = ::rotate(pos, rot_axis, rot_angle);
         detector.set_position(pos);

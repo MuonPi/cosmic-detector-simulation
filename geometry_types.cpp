@@ -31,12 +31,10 @@ void Line::rotate(const Vector& rot_axis, double rot_angle)
     q = { ::rotate(q, rot_axis, rot_angle) };
 }
 
-
 auto LineSegment::length() const -> double
 {
     return norm(line(t_start) - line(t_end));
 }
-
 
 auto Plane::distance(const Point& point) const -> double
 {
@@ -60,7 +58,7 @@ auto Plane::intersection(const Line& line) const -> Point
     if (inEpsilon(v2)) {
         //std::cerr << "Error in Plane::intersection(const Line&): line is not intersecting the plane\n";
         throw no_intersection("Plane::intersection(const Line&): line is not intersecting the plane");
-        return { };
+        return {};
     }
     double t { v1 / v2 };
     return line(t);
@@ -73,12 +71,11 @@ void Plane::rotate(const Vector& rot_axis, double rot_angle)
 
 void Plane::rotate(const matrix2d<double>& rot_matrix)
 {
-//    std::cout<<"orig plane: p="<<p<<" norm="<<normal<<"\n";
-    Plane new_plane { rot_matrix*p, rot_matrix*normal };
-//    std::cout<<"new plane:  p="<<new_plane.p<<" norm="<<new_plane.normal<<"\n";
+    //    std::cout<<"orig plane: p="<<p<<" norm="<<normal<<"\n";
+    Plane new_plane { rot_matrix * p, rot_matrix * normal };
+    //    std::cout<<"new plane:  p="<<new_plane.p<<" norm="<<new_plane.normal<<"\n";
     *this = new_plane;
 }
-
 
 ExtrudedObject::ExtrudedObject(const std::vector<Point>& vertices, const Point& position, double thickness)
     : m_vertices(vertices)
@@ -92,7 +89,7 @@ ExtrudedObject::ExtrudedObject(const Point& position, double radius, double thic
     : m_position(position)
     , m_thickness(thickness)
 {
-    for ( std::size_t n { 0 }; n < nr_vertices; ++n ) {
+    for (std::size_t n { 0 }; n < nr_vertices; ++n) {
         const double angle { twopi() * n / nr_vertices };
         Point p {
             m_position[0] + radius * std::cos(angle),
@@ -103,7 +100,8 @@ ExtrudedObject::ExtrudedObject(const Point& position, double radius, double thic
     m_planes = getPlanes();
 }
 
-const auto ExtrudedObject::position() const -> Point {
+const auto ExtrudedObject::position() const -> Point
+{
     return m_position;
 }
 
@@ -113,7 +111,8 @@ void ExtrudedObject::set_position(const Point& new_pos)
     //m_planes = getPlanes();
 }
 
-auto ExtrudedObject::thickness() const -> double {
+auto ExtrudedObject::thickness() const -> double
+{
     return m_thickness;
 }
 
@@ -170,7 +169,7 @@ auto ExtrudedObject::intersection(const Line& path) const -> LineSegment
             0., 1.
         };
     } else if (hitpoints.size() > 2) {
-        std::cerr<<"ExtrudedObject::intersection(const Line&): strange nr of intersection points: " << hitpoints.size() << "\n";
+        std::cerr << "ExtrudedObject::intersection(const Line&): strange nr of intersection points: " << hitpoints.size() << "\n";
     }
     return LineSegment {};
 }
@@ -179,7 +178,7 @@ auto ExtrudedObject::getPlanes() const -> std::vector<Plane>
 {
     std::vector<Plane> planes {};
     if (m_vertices.size() < 3) {
-        throw std::runtime_error("Error in ExtrudedObject::getPlanes(): insufficient number of vertices ("+ std::to_string(m_vertices.size())+")!");
+        throw std::runtime_error("Error in ExtrudedObject::getPlanes(): insufficient number of vertices (" + std::to_string(m_vertices.size()) + ")!");
         std::cerr << "Error in ExtrudedObject::getPlanes(): insufficient number of vertices (" << m_vertices.size() << ")!\n";
         return planes;
     }
@@ -189,7 +188,7 @@ auto ExtrudedObject::getPlanes() const -> std::vector<Plane>
         Point p0 { Point { (*vertex)[0], (*vertex)[1], 0. } };
         Point p1 { Point { (*std::next(vertex))[0], (*std::next(vertex))[1], 0. } };
         Point p2 { Point { p0[0], p0[1], m_thickness } };
-        Plane plane { p0, cross_product(p1-p0,p2-p0) };
+        Plane plane { p0, cross_product(p1 - p0, p2 - p0) };
         plane.rotate(m_rotation_matrix);
         plane.p += m_position;
         planes.push_back(std::move(plane));
@@ -197,7 +196,7 @@ auto ExtrudedObject::getPlanes() const -> std::vector<Plane>
     Point p0 { Point { (*std::prev(m_vertices.end()))[0], (*std::prev(m_vertices.end()))[1], 0. } };
     Point p1 { Point { (*m_vertices.begin())[0], (*m_vertices.begin())[1], 0. } };
     Point p2 { Point { p0[0], p0[1], m_thickness } };
-    Plane plane { p0, cross_product(p1-p0,p2-p0) };
+    Plane plane { p0, cross_product(p1 - p0, p2 - p0) };
     plane.rotate(m_rotation_matrix);
     plane.p += m_position;
     planes.push_back(std::move(plane));
@@ -251,9 +250,12 @@ auto ExtrudedObject::bounding_box() const -> std::pair<Point, Point>
     //std::cout<<"min="<<min_coordinates<<" max="<<max_coordinates<<"\n";
     min_coordinates += m_position;
     max_coordinates += m_position;
-    if (min_coordinates[0] > max_coordinates[0]) std::swap(min_coordinates[0], max_coordinates[0]);
-    if (min_coordinates[1] > max_coordinates[1]) std::swap(min_coordinates[1], max_coordinates[1]);
-    if (min_coordinates[2] > max_coordinates[2]) std::swap(min_coordinates[2], max_coordinates[2]);
+    if (min_coordinates[0] > max_coordinates[0])
+        std::swap(min_coordinates[0], max_coordinates[0]);
+    if (min_coordinates[1] > max_coordinates[1])
+        std::swap(min_coordinates[1], max_coordinates[1]);
+    if (min_coordinates[2] > max_coordinates[2])
+        std::swap(min_coordinates[2], max_coordinates[2]);
     return std::make_pair<Point, Point>(std::move(min_coordinates), std::move(max_coordinates));
 }
 
@@ -262,14 +264,11 @@ void ExtrudedObject::add_rotation(const Vector& rot_axis, double rot_angle)
     //std::cout<<"matrix before rot:\n";
     //std::cout<<m_rotation_matrix;
     matrix2d<double> K { 3,
-        {
-            0., -rot_axis[2], rot_axis[1],
+        { 0., -rot_axis[2], rot_axis[1],
             rot_axis[2], 0., -rot_axis[0],
-            -rot_axis[1], rot_axis[0], 0.
-        }
-    };
+            -rot_axis[1], rot_axis[0], 0. } };
 
-    matrix2d R { R3::Identity + std::sin(rot_angle)*K + (1.-std::cos(rot_angle))*(K*K) };
+    matrix2d R { R3::Identity + std::sin(rot_angle) * K + (1. - std::cos(rot_angle)) * (K * K) };
     m_rotation_matrix = m_rotation_matrix * R;
     //std::cout<<"matrix after rot:\n";
     //std::cout<<m_rotation_matrix;

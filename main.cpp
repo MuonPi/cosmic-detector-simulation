@@ -85,7 +85,7 @@ std::vector<Histogram> theta_scan(const DetectorSetup& setup, std::mt19937& gen,
     std::uniform_real_distribution<> distro_phi(-pi(), pi());
 
     const double theta_step { (theta_max - theta_min) / (nr_bins - 1) };
-    std::cout << "theta step: " << theta_step <<" rad = " << toDeg(theta_step) << " deg\n";
+    std::cout << "theta step: " << theta_step << " rad = " << toDeg(theta_step) << " deg\n";
     std::cout << "#theta acceptance acceptance_error\n";
     double theta { theta_min };
     for (size_t bin { 0 }; bin < nr_bins; ++bin) {
@@ -162,30 +162,29 @@ double simulate_geometric_aperture(const DetectorSetup& setup, std::mt19937& gen
     std::size_t mc_events { 0 };
     std::size_t detector_events { 0 };
     for (std::size_t n = 0; n < nr_events; ++n) {
-        const double phi { (inEpsilon(theta))?0.:distro_phi(gen) };
-        Line line { Line::generate( { distro_x(gen), distro_y(gen), simulation_plane_z_pos }, theta, phi) };
+        const double phi { (inEpsilon(theta)) ? 0. : distro_phi(gen) };
+        Line line { Line::generate({ distro_x(gen), distro_y(gen), simulation_plane_z_pos }, theta, phi) };
         bool coincidence { true };
         LineSegment refdet_path { setup.ref_detector()->intersection(line) };
         mc_events++;
         for (auto detector { setup.detectors().cbegin() };
              detector != setup.detectors().end();
-             ++detector)
-        {
+             ++detector) {
             LineSegment det_path { detector->intersection(line) };
             if (det_path.length() < DEFAULT_EPSILON) {
                 coincidence = false;
             }
         }
         if (coincidence) {
-/*
+            /*
             std::cout << "coincidence detected n="<< n << " " << std::setw(2) << toDeg(theta) << " " << toDeg(phi) << "\n";
 */
             detector_events++;
         }
     }
     double acceptance { static_cast<double>(detector_events) / mc_events };
-    std::cout << "events simulated:"<<mc_events<<"  events detected:"<<detector_events<<" acceptance:" << static_cast<double>(detector_events) / mc_events << " acceptance error: " << std::sqrt(detector_events) / mc_events << "\n";
-    
+    std::cout << "events simulated:" << mc_events << "  events detected:" << detector_events << " acceptance:" << static_cast<double>(detector_events) / mc_events << " acceptance error: " << std::sqrt(detector_events) / mc_events << "\n";
+
     dimensions = { (bounds.second - bounds.first) };
     const double simulation_area { 1e-6 * dimensions[0] * dimensions[1] };
     double effective_area { acceptance * simulation_area };
@@ -283,7 +282,8 @@ std::vector<Histogram> cosmic_simulation(const DetectorSetup& setup, std::mt1993
         return histos;
     }
 
-    if (coinc_level < 0) coinc_level = setup.detectors().size();
+    if (coinc_level < 0)
+        coinc_level = setup.detectors().size();
 
     Histogram theta_hist("theta_distribution", nr_bins, 0., theta_max);
     Histogram phi_hist("phi_distribution", nr_bins, -pi(), pi());
@@ -318,7 +318,7 @@ std::vector<Histogram> cosmic_simulation(const DetectorSetup& setup, std::mt1993
         const double theta { distro_theta(gen) };
         const double phi { distro_phi(gen) };
         Line line {
-            Line::generate( { distro_x(gen), distro_y(gen), distro_z(gen) }, theta, phi)
+            Line::generate({ distro_x(gen), distro_y(gen), distro_z(gen) }, theta, phi)
         };
 
         theta_hist.fill(theta);
@@ -432,9 +432,9 @@ auto main() -> int
     // definition of the large detector bars for JLU cosmic detector array
     const std::vector<Point> large_bar_points {
         { -500., -50. },
-        {  500., -50. },
-        {  500.,  50. },
-        { -500.,  50. },
+        { 500., -50. },
+        { 500., 50. },
+        { -500., 50. },
     };
 
     // create 3d objects of type ExtrudedObject defined by the 2d outline,
@@ -442,7 +442,7 @@ auto main() -> int
     ExtrudedObject detector1 { octagon_points, { 0., 0., 150. }, 10. };
     ExtrudedObject detector2 { octagon_points, { 0., 0., 0. }, 10. };
 
-    // create 3d objects of type ExtrudedObject but using the constructor for generation of a 
+    // create 3d objects of type ExtrudedObject but using the constructor for generation of a
     // circular shape specified by a global position offset, radius, thickness and an optional
     // number of vertex points to generate the circle
     ExtrudedObject round_detector1 { { 0., 0., 0. }, 50., 10. };
@@ -460,7 +460,7 @@ auto main() -> int
 
     // uncomment the following block to calculate the double differential acceptance
     // as function of phi and theta
-/*
+    /*
     [[maybe_unused]] const auto acceptance_phi_theta = theta_phi_scan<361, 46>(setup, gen, nr_events, 0., theta_max, -pi(), pi());
 */
 

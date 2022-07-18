@@ -3,8 +3,8 @@
 
 #include "algebra_types.h"
 #include "algebra_utils.h"
-#include <cassert>
 #include "geometry_types.h"
+#include <cassert>
 
 std::ostream& operator<<(std::ostream& os, const std::valarray<double>& p)
 {
@@ -45,19 +45,19 @@ bool isFuzzySame(const std::valarray<double>& a, const std::valarray<double>& b,
 
 Point rotate(const Point& p, const Vector& rot_axis, double rot_angle)
 {
-    const Vector k { rot_axis/norm(rot_axis) };
+    const Vector k { rot_axis / norm(rot_axis) };
     const double c { std::cos(rot_angle) };
     const double s { std::sin(rot_angle) };
-    return { p + s * cross_product(k,p) + (1. - c) * cross_product(k, cross_product(k,p) ) };
+    return { p + s * cross_product(k, p) + (1. - c) * cross_product(k, cross_product(k, p)) };
 }
 
 Vector operator*(const matrix2d<double>& lhs, const Vector& rhs)
 {
     assert(lhs.cols() == rhs.size());
     Vector result(lhs.cols());
-    for(size_t j = 0; j < lhs.cols(); ++j) {
+    for (size_t j = 0; j < lhs.cols(); ++j) {
         // Take dot product of row a[i] and col b[j]
-        result[j] = (lhs.row(j)*rhs).sum();
+        result[j] = (lhs.row(j) * rhs).sum();
     }
     //std::cout<<"Vector operator*(const matrix2d<double>& lhs, const Vector& rhs)\n";
     return result;
@@ -66,11 +66,11 @@ Vector operator*(const matrix2d<double>& lhs, const Vector& rhs)
 std::ostream& operator<<(std::ostream& os, const matrix2d<double>& m)
 {
     for (size_t r { 0 }; r < m.rows(); ++r) {
-        os<<"|";
+        os << "|";
         for (size_t c { 0 }; c < m.cols(); ++c) {
-            os<<m(r,c)<< " ";
+            os << m(r, c) << " ";
         }
-        os<<"|\n";
+        os << "|\n";
     }
     return os;
 }

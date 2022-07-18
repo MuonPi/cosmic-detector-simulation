@@ -2,9 +2,9 @@
 
 #include <cmath>
 #include <functional>
+#include <stdexcept>
 #include <valarray>
 #include <vector>
-#include <stdexcept>
 
 #include "algebra_types.h"
 
@@ -16,7 +16,7 @@
 struct Line {
     Point p {}; //<! the reference point of the line
     Vector q {}; //<! the direction vector
-    
+
     /** @brief evaluate the locus of the line at parameter value t
     * @param t scalar line parameter. t=0 for ref point
     * @return the locus of the line at the selected t-parameter
@@ -36,7 +36,7 @@ struct Line {
     * @return line object
     */
     static auto generate(Point p0, double theta, double phi) -> Line;
-    
+
     /** @brief rotate the line about given axis by given angle
     * @param rot_axis the axis about which the rotation is performed
     * @param rot_angle the rotation angle (in radians)
@@ -60,8 +60,12 @@ struct LineSegment {
 struct Plane {
     Point p {}; //<! the reference point
     Vector normal {}; //<! the normal vector
-    struct no_normal : std::runtime_error { using std::runtime_error::runtime_error; };
-    struct no_intersection : std::runtime_error { using std::runtime_error::runtime_error; };
+    struct no_normal : std::runtime_error {
+        using std::runtime_error::runtime_error;
+    };
+    struct no_intersection : std::runtime_error {
+        using std::runtime_error::runtime_error;
+    };
     auto distance(const Point& point) const -> double;
     auto intersection(const Line& line) const -> Point;
 
