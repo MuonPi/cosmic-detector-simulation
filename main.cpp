@@ -127,6 +127,18 @@ std::vector<Histogram> theta_scan(const DetectorSetup& setup, std::mt19937& gen,
     return histos;
 }
 
+/** @brief simulate_geometric_aperture
+ * This function does Monte-Carlo simulated evaluation of the effective detector area.
+ * @param setup DetectorSetup object containing the detector definitions
+ * @param gen random number generator (Mersenne-Twister engine of type std::mt19937)
+ * @param nr_events The number of tracks to be generated.
+ * @param theta the theta angle of the generated tracks (default=0)
+ * @return the absolute effective area in m^2
+ * @note The generated tracks are distributed over an area at least 5 times larger
+ * than the boundaries of the ref detector. The number of tracks intersecting all detectors
+ * to the number of tracks generated is taken as a measure of the area provided that
+ * the scale of the detector dimensions is in millimeters.
+*/
 double simulate_geometric_aperture(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta = 0.)
 {
     if (setup.ref_detector() == setup.detectors().end()) {
