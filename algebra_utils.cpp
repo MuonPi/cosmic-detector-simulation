@@ -37,10 +37,10 @@ bool inEpsilon(double value, double eps)
     return true;
 }
 
-bool isFuzzySame(const std::valarray<double>& a, const std::valarray<double>& b)
+bool isFuzzySame(const std::valarray<double>& a, const std::valarray<double>& b, double eps)
 {
     assert(a.size() == b.size());
-    return inEpsilon(norm(a - b));
+    return inEpsilon(norm(a - b), eps);
 }
 
 Point rotate(const Point& p, const Vector& rot_axis, double rot_angle)

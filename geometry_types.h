@@ -9,11 +9,13 @@
 #include "algebra_types.h"
 
 /** @brief Line - struct representing a geometric line in R^n
- * The line is comprised of a reference point p and a direction vector q 
-*/
+ * The line is comprised of a reference point p and a direction vector q.
+ * Any point of the line is represented by the locus p(t) = p + t*q
+ * with the line parameter t.
+ */
 struct Line {
-    Point p {};
-    Vector q {};
+    Point p {}; //<! the reference point of the line
+    Vector q {}; //<! the direction vector
     
     /** @brief evaluate the locus of the line at parameter value t
     * @param t scalar line parameter. t=0 for ref point
@@ -42,6 +44,9 @@ struct Line {
     void rotate(const Vector& rot_axis, double rot_angle);
 };
 
+/** @brief LineSegment - struct representing a geometric line segment in R^n 
+ * with start and end points indicated by t_start and t_end parameter
+ */
 struct LineSegment {
     Line line {};
     double t_start {};
@@ -49,14 +54,14 @@ struct LineSegment {
     auto length() const -> double;
 };
 
+/** @brief Plane - struct representing a geometric plane in R^n.
+ * The plane is comprised of a reference point p and a normal vector.
+ */
 struct Plane {
     Point p {};
     Vector normal {};
-    //Vector q {};
-    //Vector r {};
     struct no_normal : std::runtime_error { using std::runtime_error::runtime_error; };
     struct no_intersection : std::runtime_error { using std::runtime_error::runtime_error; };
-    auto operator()(double t, double s) const -> Point;
     auto distance(const Point& point) const -> double;
     auto intersection(const Line& line) const -> Point;
 
@@ -66,6 +71,10 @@ struct Plane {
      * @note Rotates the normal vector of the plane. The reference point is preserved.
     */
     void rotate(const Vector& rot_axis, double rot_angle);
+
+    /** @brief Rotate the plane through the given rotation matrix.
+     * @param rot_matrix the matrix performing the rotation
+    */
     void rotate(const matrix2d<double>& rot_matrix);
 };
 
