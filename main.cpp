@@ -392,7 +392,6 @@ auto main() -> int
     // with the last element in the vector
 
     // definition of the large double-paddle detector in IIPI-JLU lab
-
     const std::vector<Point> large_paddle_points_upper {
         { -150., -87.5 },
         { 150., -87.5 },
@@ -431,7 +430,6 @@ auto main() -> int
     // definition of the MuonPi hexagon (small-size) detector
     constexpr double hex_length_a { 34.64 };
     constexpr double hex_length_b { 30.0 };
-
     const std::vector<Point> hexagon_detector_points {
         { -hex_length_a, 0. },
         { -hex_length_a / 2, -hex_length_b },
@@ -460,7 +458,7 @@ auto main() -> int
     ExtrudedObject round_detector1 { { 0., 0., 0. }, 50., 10. };
     ExtrudedObject round_detector2 { { 0., 0., 100. }, 50., 10. };
 
-    // construct a detector setup with the two detectors
+    // construct a detector setup with two detectors
     DetectorSetup setup { { detector1, detector2 } };
 
     // simulate the effective area (geometric aperture) at theta=0 of the detector system
