@@ -381,7 +381,9 @@ auto main() -> int
     constexpr std::size_t nr_events { 100'000 }; //<! the total number of tracks to be simulated
     constexpr double theta_max { toRad(90.) }; //<! the maximum theta angle taken into account
     constexpr double theta_step { toRad(1.) }; //<! the desired granularity of the simulated angular distributions
-
+    const Vector detector_rotation_axis { R3::Base::X };
+    constexpr double detector_rotation_angle { toRad(0.) };
+    
     constexpr std::size_t nr_bins { static_cast<int>(theta_max / theta_step) + 1 };
     std::cout << "nr of bins: " << nr_bins << "\n";
 
@@ -466,7 +468,7 @@ auto main() -> int
 
     // add a rotation to the system
     // rotation of 45 degrees around x-axis
-    setup.rotate(R3::Base::X, pi() / 4);
+    setup.rotate(detector_rotation_axis, detector_rotation_angle);
 
     // uncomment the following block to calculate the double differential acceptance
     // as function of phi and theta
