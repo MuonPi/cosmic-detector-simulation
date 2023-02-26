@@ -83,11 +83,12 @@ public:
   {
         assert(A.cols() == B.rows());
         matrix2d result { A.rows(), B.cols() };
-        for(size_t i = 0; i < A.rows(); ++i)
+        for(size_t i = 0; i < A.rows(); ++i) {
             for(size_t j = 0; j < B.cols(); ++j) {
                 // Take dot product of row a[i] and col b[j]
                 result(i,j) = (A.row(i)*B.col(j)).sum();
             }
+        }
         return result;
   }
 
@@ -102,10 +103,11 @@ public:
   {
         assert(A.cols() == B.cols() && A.rows() == B.rows());
         matrix2d result { A.rows(), A.cols() };
-        for(size_t i = 0; i < A.rows(); ++i)
+        for(size_t i = 0; i < A.rows(); ++i) {
             for(size_t j = 0; j < B.cols(); ++j) {
                 result(i,j) = A(i,j) + B(i,j);
             }
+        }
         return result;
   }
   
@@ -113,10 +115,11 @@ public:
   {
         assert(A.cols() == B.cols() && A.rows() == B.rows());
         matrix2d result { A.rows(), A.cols() };
-        for(size_t i = 0; i < A.rows(); ++i)
+        for(size_t i = 0; i < A.rows(); ++i) {
             for(size_t j = 0; j < B.cols(); ++j) {
                 result(i,j) = A(i,j) - B(i,j);
             }
+        }
         return result;
   }
 
@@ -222,107 +225,81 @@ T matrix2d<T>::operator()(std::size_t r, std::size_t c) const {
 
 template<class T>
 matrix2d<T> matrix2d<T>::transpose() {
-
-  matrix2d<T> result(cols_, rows_);
-
-  for (std::size_t i = 0; i < rows_; ++i)
-    result.col(i) = static_cast<std::valarray<T> > (row(i));
-
-  return result;
+    matrix2d<T> result(cols_, rows_);
+    for (std::size_t i = 0; i < rows_; ++i) {
+        result.col(i) = static_cast<std::valarray<T> > (row(i));
+    }
+    return result;
 }
 
 template<class T>
 matrix2d<T> matrix2d<T>::rowItmSort() {
-
-  matrix2d<T> result(rows_, cols_);
-
-  for (std::size_t i = 0; i < rows_; ++i) {
-
-    std::valarray<T> x = static_cast<std::valarray<T> > (row(i));
-    std::sort(&x[0], &x[cols_]);
-    result.row(i) = x;
-  }
-
-  return result;
+    matrix2d<T> result(rows_, cols_);
+    for (std::size_t i = 0; i < rows_; ++i) {
+        std::valarray<T> x = static_cast<std::valarray<T> > (row(i));
+        std::sort(&x[0], &x[cols_]);
+        result.row(i) = x;
+    }
+    return result;
 }
 
 template<class T> bool rev (const T & a, const T & b) { return a > b; }
 
 template<class T>
 matrix2d<T> matrix2d<T>::rowItmSortRev() {
-
-  matrix2d<T> result(rows_, cols_);
-
-  for (std::size_t i = 0; i < rows_; ++i) {
-
-    std::valarray<T> x = static_cast<std::valarray<T> > (row(i));
-    std::sort(&x[0], &x[cols_], rev<T>);
-    result.row(i) = x;
-  }
-
-  return result;
+    matrix2d<T> result(rows_, cols_);
+    for (std::size_t i = 0; i < rows_; ++i) {
+        std::valarray<T> x = static_cast<std::valarray<T> > (row(i));
+        std::sort(&x[0], &x[cols_], rev<T>);
+        result.row(i) = x;
+    }
+    return result;
 }
 
 template<class T>
 matrix2d<T> matrix2d<T>::colItmSort() {
-
-  matrix2d<T> result(rows_, cols_);
-
-  for (std::size_t i = 0; i < cols_; ++i) {
-
-    std::valarray<T> x = static_cast<std::valarray<T> > (col(i));
-    std::sort(&x[0], &x[rows_]);
-    result.col(i) = x;
-  }
-
-  return result;
+    matrix2d<T> result(rows_, cols_);
+    for (std::size_t i = 0; i < cols_; ++i) {
+        std::valarray<T> x = static_cast<std::valarray<T> > (col(i));
+        std::sort(&x[0], &x[rows_]);
+        result.col(i) = x;
+    }
+    return result;
 }
 
 template<class T>
 matrix2d<T> matrix2d<T>::colItmSortRev() {
-
-  matrix2d<T> result(rows_, cols_);
-
-  for (std::size_t i = 0; i < cols_; ++i) {
-
-    std::valarray<T> x = static_cast<std::valarray<T> > (col(i));
-    std::sort(&x[0], &x[rows_], rev<T>);
-    result.col(i) = x;
-  }
-
-  return result;
+    matrix2d<T> result(rows_, cols_);
+    for (std::size_t i = 0; i < cols_; ++i) {
+        std::valarray<T> x = static_cast<std::valarray<T> > (col(i));
+        std::sort(&x[0], &x[rows_], rev<T>);
+        result.col(i) = x;
+    }
+    return result;
 }
 
 template<class T>
 matrix2d<T> matrix2d<T>::appendRows(matrix2d<T> &m) {
-
-  matrix2d<T> result(rows_ + m.rows_, cols_);
-
-  result.data_[std::slice(0, rows_ * cols_, 1)] = data_;
-  result.data_[std::slice(rows_ * cols_, m.rows_ * m.cols_, 1)] = m.data_;
-
-  return result;
+    matrix2d<T> result(rows_ + m.rows_, cols_);
+    result.data_[std::slice(0, rows_ * cols_, 1)] = data_;
+    result.data_[std::slice(rows_ * cols_, m.rows_ * m.cols_, 1)] = m.data_;
+    return result;
 }
 
 template<class T>
 matrix2d<T> matrix2d<T>::appendCols(matrix2d<T> &m) {
-
-  matrix2d<T> result(rows_, cols_ + m.cols_);
-
-  std::size_t s1[] = {rows_,cols_}; // shape of left matrix
-  std::size_t p1[] = {result.cols_,1}; // position of left matrix in result
-  std::size_t s2[] = {m.rows_,m.cols_}; // shape of right matrix
-  std::size_t p2[] = {result.cols_,1}; // position or right matrix in result
-
-  std::valarray<std::size_t> sv1(s1, 2);
-  std::valarray<std::size_t> pv1(p1, 2);
-  std::valarray<std::size_t> sv2(s2, 2);
-  std::valarray<std::size_t> pv2(p2, 2);
-
-  result.data_[std::gslice(0, sv1, pv1)] = data_; // copy left matrix into place
-  result.data_[std::gslice(cols_, sv2, pv2)] = m.data_; // repeat for m
-
-  return result;
+    matrix2d<T> result(rows_, cols_ + m.cols_);
+    std::size_t s1[] = {rows_,cols_}; // shape of left matrix
+    std::size_t p1[] = {result.cols_,1}; // position of left matrix in result
+    std::size_t s2[] = {m.rows_,m.cols_}; // shape of right matrix
+    std::size_t p2[] = {result.cols_,1}; // position or right matrix in result
+    std::valarray<std::size_t> sv1(s1, 2);
+    std::valarray<std::size_t> pv1(p1, 2);
+    std::valarray<std::size_t> sv2(s2, 2);
+    std::valarray<std::size_t> pv2(p2, 2);
+    result.data_[std::gslice(0, sv1, pv1)] = data_; // copy left matrix into place
+    result.data_[std::gslice(cols_, sv2, pv2)] = m.data_; // repeat for m
+    return result;
 }
 
 template<class T>

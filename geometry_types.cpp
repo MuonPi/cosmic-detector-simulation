@@ -242,12 +242,8 @@ auto ExtrudedObject::bounding_box() const -> std::pair<Point, Point>
     }
 
     max_coordinates += { 0., 0., m_thickness };
-    //std::cout<<"before rot:\n";
-    //std::cout<<"min="<<min_coordinates<<" max="<<max_coordinates<<"\n";
-    min_coordinates = { m_rotation_matrix * min_coordinates };
+    min_coordinates = m_rotation_matrix * min_coordinates;
     max_coordinates = m_rotation_matrix * max_coordinates;
-    //std::cout<<"after rot:\n";
-    //std::cout<<"min="<<min_coordinates<<" max="<<max_coordinates<<"\n";
     min_coordinates += m_position;
     max_coordinates += m_position;
     if (min_coordinates[0] > max_coordinates[0])
