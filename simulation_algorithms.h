@@ -1,3 +1,5 @@
+#pragma once
+
 #include <random>
 #include <vector>
 #include <fstream>
@@ -9,40 +11,6 @@
 #include "histogram.h"
 #include "sampled_distribution.h"
 #include "utilities.h"
-
-template <typename T>
-struct DataItem {
-    T value {};
-    T error {};
-};
-
-template <typename T, typename U>
-struct DataSeries {
-public:
-    DataSeries() = default;
-    ~DataSeries() = default;
-    void add(DataItem<T> xval, DataItem<U> yval) {
-        m_values.emplace_back( std::move(xval), std::move(yval) );
-    }
-    auto size() const -> std::size_t { return m_values.size(); }
-    void clear() { m_values.clear(); }
-    auto empty() const -> bool { return m_values.empty(); }
-    void export_file(const std::string& filename)
-    {
-        std::ofstream ofs(filename, std::ofstream::out);
-        ofs << "# Data series\n";
-        ofs << "# " << size() << " entries\n";
-        ofs << "# x err(x) y err(y)\n";
-        for (const auto& [xval,yval]: m_values) {
-            ofs << xval.value << " " << xval.error << " " << yval.value << " " << yval.error << "\n";
-        }
-        ofs.close();
-    }
-
-private:
-    std::vector<std::pair<DataItem<T>,DataItem<U>>> m_values {};
-};
-
 
 /** @brief theta_scan
  * This function does Monte-Carlo simulated evaluation of particle hits for a given detector setup iterating over the specified theta angular range. Tracks are distributed as follows:
@@ -58,7 +26,7 @@ private:
  * @note In case of an error, the returned histogram vector is empty
  * @note The setup object must have the ref_detector iterator set to any valid detector it contains.
 */
-std::vector<Histogram> theta_scan(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta_min, double theta_max, std::size_t nr_bins);
+void theta_scan(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta_min, double theta_max, std::size_t nr_bins, std::vector<Histogram>* histos = nullptr);
 
 
 /** @brief simulate_geometric_aperture
@@ -99,4 +67,4 @@ std::array<std::array<double, THETA_BINS>, PHI_BINS> theta_phi_scan(const Detect
 */
 DataItem<double> cosmic_simulation(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, std::vector<Histogram>* histos = nullptr, std::size_t nr_bins = 90, double theta_max = pi()/2, int coinc_level = -1);
 
-DataSeries<double,double> cosmic_simulation_detector_sweep(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, const Vector& detector_rotation_axis, double detector_min_angle, double detector_max_angle, std::size_t nr_angles, int coinc_level = -1);
+MeasurementVector<double,double> cosmic_simulation_detector_sweep(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, const Vector& detector_rotation_axis, double detector_min_angle, double detector_max_angle, std::size_t nr_angles, int coinc_level = -1);

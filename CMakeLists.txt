@@ -25,6 +25,7 @@ set(SOURCE_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/histogram.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/detector_setup.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulation_algorithms.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp"
 )
 
 set(HEADER_FILES

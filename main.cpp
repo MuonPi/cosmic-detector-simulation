@@ -23,6 +23,7 @@
 #include "simulation_algorithms.h"
 
 constexpr int g_verbosity { 3 };
+constexpr double muon_flux_literature_value { 80. };
 
 auto main() -> int
 {
@@ -147,14 +148,33 @@ auto main() -> int
 
     // run a scan over theta angle (uniformly distributed)
     // to record the detector acceptance, if required
-//    Append(histos, theta_scan(setup, gen, nr_events, 0., theta_max, nr_bins));
+    theta_scan(setup, gen, nr_events, 0., theta_max, nr_bins, &histos);
 
     // now, run the full simulation and append the resulting histograms
     // to the already existing histogram vector
-    //cosmic_simulation(setup, gen, nr_events * nr_bins, &histos, nr_bins, theta_max);
+    cosmic_simulation(setup, gen, nr_events * nr_bins, &histos, nr_bins, theta_max);
 
-    auto acceptance_dataseries { cosmic_simulation_detector_sweep(setup, gen, nr_events, detector_rotation_axis, toRad(-90.), toRad(90.), 90) };
-    acceptance_dataseries.export_file("detector_sweep_acceptances.dat");
+    // run a sweep over angular range of detector orientation
+    // return a list of acceptance vs angle including statistical errors
+    auto acceptance_dataseries { cosmic_simulation_detector_sweep(setup, gen, nr_events, detector_rotation_axis, toRad(-90.), toRad(90.), 181) };
+
+    // define a second list which shall hold count rate values calculated from acceptance
+    MeasurementVector<double,double> countrate_vs_angle_dataseries {};
+
+    // calculate count rate for every angular acceptance
+    for ( const auto& [angle_item, acceptance_item] : acceptance_dataseries ) {
+        DataItem<double> countrate_item { acceptance_item };
+        const double countrate_conversion {
+            2. * pi() * effective_area_sqm / 3. * muon_flux_literature_value
+        };
+        countrate_item.value *= countrate_conversion;
+        countrate_item.error *= countrate_conversion;
+        countrate_vs_angle_dataseries.emplace_back(angle_item,countrate_item);
+    }
+
+    // export data series for acceptance and count rate vs angle
+    export_file(acceptance_dataseries, "detector_sweep_acceptances.dat");
+    export_file(countrate_vs_angle_dataseries, "detector_sweep_countrate.dat");
 
     // export each histogram into a separate file (human readable ASCII format)
     for (auto histo : histos) {

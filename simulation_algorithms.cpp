@@ -22,13 +22,11 @@
 #include "simulation_algorithms.h"
 #include "utilities.h"
 
-std::vector<Histogram> theta_scan(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta_min, double theta_max, std::size_t nr_bins)
+void theta_scan(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta_min, double theta_max, std::size_t nr_bins, std::vector<Histogram>* histos)
 {
-    std::vector<Histogram> histos {};
-
     if (setup.ref_detector() == setup.detectors().end()) {
         std::cerr << "no reference detector defined in DetectorSetup!\n";
-        return histos;
+        return;
     }
 
     Histogram acc_hist("acceptance_scan_theta",
@@ -90,8 +88,7 @@ std::vector<Histogram> theta_scan(const DetectorSetup& setup, std::mt19937& gen,
         std::cout << std::flush;
         theta += theta_step;
     }
-    histos.push_back(acc_hist);
-    return histos;
+    if (histos!=nullptr) histos->push_back(acc_hist);
 }
 
 double simulate_geometric_aperture(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta)
@@ -313,9 +310,9 @@ DataItem<double> cosmic_simulation(const DetectorSetup& setup, std::mt19937& gen
 }
 
 
-DataSeries<double,double> cosmic_simulation_detector_sweep(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, const Vector& detector_rotation_axis, double detector_min_angle, double detector_max_angle, std::size_t nr_angles, int coinc_level)
+MeasurementVector<double,double> cosmic_simulation_detector_sweep(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, const Vector& detector_rotation_axis, double detector_min_angle, double detector_max_angle, std::size_t nr_angles, int coinc_level)
 {
-    DataSeries<double,double> data_series {};
+    MeasurementVector<double,double> data_series {};
     //std::cout<<"rot matrix of orig. setup:\n"<<setup.ref_detector()->get_rotation_matrix();
     auto rotated_setup { setup };
     //std::cout<<"rot matrix of copied setup:\n"<<rotated_setup.ref_detector()->get_rotation_matrix();
@@ -325,7 +322,7 @@ DataSeries<double,double> cosmic_simulation_detector_sweep(const DetectorSetup& 
     rotated_setup.rotate(detector_rotation_axis, detector_min_angle);
     for (std::size_t i = 0; i < nr_angles; ++i) {
         DataItem<double> item { cosmic_simulation(rotated_setup, gen, nr_events, nullptr, 90, toRad(90.), coinc_level) };
-        data_series.add( {angle, dtheta}, std::move(item) );
+        data_series.emplace_back( DataItem<double>({angle, dtheta}), std::move(item) );
         std::cout << "current angle=" << toDeg(angle) << "deg\n";
         angle += dtheta;
         rotated_setup.rotate(detector_rotation_axis, dtheta);
