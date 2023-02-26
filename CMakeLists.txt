@@ -24,6 +24,7 @@ set(SOURCE_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/geometry_types.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/histogram.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/detector_setup.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulation_algorithms.cpp"
 )
 
 set(HEADER_FILES
@@ -33,6 +34,8 @@ set(HEADER_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/algebra_utils.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/geometry_types.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/detector_setup.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/utilities.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulation_algorithms.h"
 )
 
 # tell cmake to build our executable
