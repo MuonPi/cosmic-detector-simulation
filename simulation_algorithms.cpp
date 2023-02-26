@@ -88,7 +88,8 @@ void theta_scan(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_ev
         std::cout << std::flush;
         theta += theta_step;
     }
-    if (histos!=nullptr) histos->push_back(acc_hist);
+    if (histos != nullptr)
+        histos->push_back(acc_hist);
 }
 
 double simulate_geometric_aperture(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta)
@@ -229,7 +230,7 @@ DataItem<double> cosmic_simulation(const DetectorSetup& setup, std::mt19937& gen
     DataItem<double> data_item {};
     if (setup.ref_detector() == setup.detectors().end()) {
         std::cerr << "no reference detector defined in DetectorSetup!\n";
-        return DataItem<double>{};
+        return DataItem<double> {};
     }
 
     if (coinc_level < 0)
@@ -300,7 +301,7 @@ DataItem<double> cosmic_simulation(const DetectorSetup& setup, std::mt19937& gen
         }
     }
     std::cout << "MC events: " << mc_events << " detected events: " << detector_events << " acceptance: " << static_cast<double>(detector_events) / mc_events << " err(acceptance): " << std::sqrt(detector_events) / mc_events << "\n";
-    if ( histos != nullptr ) {
+    if (histos != nullptr) {
         histos->push_back(std::move(theta_hist));
         histos->push_back(std::move(phi_hist));
         histos->push_back(std::move(theta_acc_hist));
@@ -309,20 +310,19 @@ DataItem<double> cosmic_simulation(const DetectorSetup& setup, std::mt19937& gen
     return { static_cast<double>(detector_events) / mc_events, std::sqrt(detector_events) / mc_events };
 }
 
-
-MeasurementVector<double,double> cosmic_simulation_detector_sweep(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, const Vector& detector_rotation_axis, double detector_min_angle, double detector_max_angle, std::size_t nr_angles, int coinc_level)
+MeasurementVector<double, double> cosmic_simulation_detector_sweep(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, const Vector& detector_rotation_axis, double detector_min_angle, double detector_max_angle, std::size_t nr_angles, int coinc_level)
 {
-    MeasurementVector<double,double> data_series {};
+    MeasurementVector<double, double> data_series {};
     //std::cout<<"rot matrix of orig. setup:\n"<<setup.ref_detector()->get_rotation_matrix();
     auto rotated_setup { setup };
     //std::cout<<"rot matrix of copied setup:\n"<<rotated_setup.ref_detector()->get_rotation_matrix();
-    const double dtheta { (detector_max_angle - detector_min_angle)/nr_angles };
+    const double dtheta { (detector_max_angle - detector_min_angle) / nr_angles };
     std::cout << "min angle=" << detector_min_angle << ", dtheta=" << dtheta << "\n";
     double angle { detector_min_angle };
     rotated_setup.rotate(detector_rotation_axis, detector_min_angle);
     for (std::size_t i = 0; i < nr_angles; ++i) {
         DataItem<double> item { cosmic_simulation(rotated_setup, gen, nr_events, nullptr, 90, toRad(90.), coinc_level) };
-        data_series.emplace_back( DataItem<double>({angle, dtheta}), std::move(item) );
+        data_series.emplace_back(DataItem<double>({ angle, dtheta }), std::move(item));
         std::cout << "current angle=" << toDeg(angle) << "deg\n";
         angle += dtheta;
         rotated_setup.rotate(detector_rotation_axis, dtheta);

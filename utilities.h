@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
-#include <cmath>
 #include "algebra_utils.h"
+#include <cmath>
+#include <vector>
 
 template <typename T>
 struct DataItem {
@@ -11,7 +11,7 @@ struct DataItem {
 };
 
 template <typename T, typename U>
-using MeasurementVector = std::vector<std::pair<DataItem<T>,DataItem<U>>>;
+using MeasurementVector = std::vector<std::pair<DataItem<T>, DataItem<U>>>;
 
 constexpr double toDeg(double x) { return x * 180 / pi(); }
 constexpr double toRad(double x) { return x * pi() / 180; }
@@ -26,4 +26,4 @@ auto cos2cdf = [](double x) {
     return (2 / pi()) * (x / 2. + sin(2. * x) / 4.) + 0.5; //from Wolfram Alpha
 };
 
-void export_file(const MeasurementVector<double,double>& data, const std::string& filename);
+void export_file(const MeasurementVector<double, double>& data, const std::string& filename);

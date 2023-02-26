@@ -19,8 +19,8 @@
 #include "geometry_types.h"
 #include "histogram.h"
 #include "sampled_distribution.h"
-#include "utilities.h"
 #include "simulation_algorithms.h"
+#include "utilities.h"
 
 constexpr int g_verbosity { 3 };
 constexpr double muon_flux_literature_value { 80. };
@@ -42,7 +42,7 @@ auto main() -> int
     // define the rotation angle
     // set to 0, if setup should not be rotated
     constexpr double detector_rotation_angle { toRad(0.) };
-    
+
     constexpr std::size_t nr_bins { static_cast<int>(theta_max / theta_step) + 1 };
     std::cout << "nr of bins: " << nr_bins << "\n";
 
@@ -159,17 +159,17 @@ auto main() -> int
     auto acceptance_dataseries { cosmic_simulation_detector_sweep(setup, gen, nr_events, detector_rotation_axis, toRad(-90.), toRad(90.), 181) };
 
     // define a second list which shall hold count rate values calculated from acceptance
-    MeasurementVector<double,double> countrate_vs_angle_dataseries {};
+    MeasurementVector<double, double> countrate_vs_angle_dataseries {};
 
     // calculate count rate for every angular acceptance
-    for ( const auto& [angle_item, acceptance_item] : acceptance_dataseries ) {
+    for (const auto& [angle_item, acceptance_item] : acceptance_dataseries) {
         DataItem<double> countrate_item { acceptance_item };
         const double countrate_conversion {
             2. * pi() * effective_area_sqm / 3. * muon_flux_literature_value
         };
         countrate_item.value *= countrate_conversion;
         countrate_item.error *= countrate_conversion;
-        countrate_vs_angle_dataseries.emplace_back(angle_item,countrate_item);
+        countrate_vs_angle_dataseries.emplace_back(angle_item, countrate_item);
     }
 
     // export data series for acceptance and count rate vs angle

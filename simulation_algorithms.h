@@ -1,8 +1,8 @@
 #pragma once
 
+#include <fstream>
 #include <random>
 #include <vector>
-#include <fstream>
 
 #include "algebra_types.h"
 #include "algebra_utils.h"
@@ -28,7 +28,6 @@
 */
 void theta_scan(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta_min, double theta_max, std::size_t nr_bins, std::vector<Histogram>* histos = nullptr);
 
-
 /** @brief simulate_geometric_aperture
  * This function does Monte-Carlo simulated evaluation of the effective detector area.
  * @param setup DetectorSetup object containing the detector definitions
@@ -43,13 +42,11 @@ void theta_scan(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_ev
 */
 double simulate_geometric_aperture(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta = 0.);
 
-
 /** @brief theta_scan
  * This function ...
 */
 template <int PHI_BINS = 256, int THETA_BINS = 256>
 std::array<std::array<double, THETA_BINS>, PHI_BINS> theta_phi_scan(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta_min, double theta_max, double phi_min, double phi_max);
-
 
 /** @brief cosmic_simulation
  * This function does a full Monte-Carlo simulated evaluation of particle hits for a given detector setup. Tracks are distributed as follows:
@@ -65,6 +62,6 @@ std::array<std::array<double, THETA_BINS>, PHI_BINS> theta_phi_scan(const Detect
  * @note In case of an error, the returned histogram vector is empty
  * @note The setup object must have the ref_detector iterator set to any valid detector it contains.
 */
-DataItem<double> cosmic_simulation(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, std::vector<Histogram>* histos = nullptr, std::size_t nr_bins = 90, double theta_max = pi()/2, int coinc_level = -1);
+DataItem<double> cosmic_simulation(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, std::vector<Histogram>* histos = nullptr, std::size_t nr_bins = 90, double theta_max = pi() / 2, int coinc_level = -1);
 
-MeasurementVector<double,double> cosmic_simulation_detector_sweep(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, const Vector& detector_rotation_axis, double detector_min_angle, double detector_max_angle, std::size_t nr_angles, int coinc_level = -1);
+MeasurementVector<double, double> cosmic_simulation_detector_sweep(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, const Vector& detector_rotation_axis, double detector_min_angle, double detector_max_angle, std::size_t nr_angles, int coinc_level = -1);
