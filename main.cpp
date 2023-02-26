@@ -36,7 +36,10 @@ auto main() -> int
     constexpr std::size_t nr_events { 100'000 }; //<! the total number of tracks to be simulated
     constexpr double theta_max { toRad(90.) }; //<! the maximum theta angle taken into account
     constexpr double theta_step { toRad(1.) }; //<! the desired granularity of the simulated angular distributions
+    // define rotation axis, here x-axis
     const Vector detector_rotation_axis { R3::Base::X };
+    // define the rotation angle
+    // set to 0, if setup should not be rotated
     constexpr double detector_rotation_angle { toRad(0.) };
     
     constexpr std::size_t nr_bins { static_cast<int>(theta_max / theta_step) + 1 };
