@@ -59,7 +59,6 @@ Vector operator*(const matrix2d<double>& lhs, const Vector& rhs)
         // Take dot product of row a[i] and col b[j]
         result[j] = (lhs.row(j) * rhs).sum();
     }
-    //std::cout<<"Vector operator*(const matrix2d<double>& lhs, const Vector& rhs)\n";
     return result;
 }
 
