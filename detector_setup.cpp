@@ -23,6 +23,7 @@ DetectorSetup::DetectorSetup(const DetectorSetup& other)
 
 void DetectorSetup::rotate(const Vector& rot_axis, double rot_angle)
 {
+    if (inEpsilon(rot_angle)) return;
     for (auto& detector : m_detectors) {
         Point pos { detector.position() };
         pos = ::rotate(pos, rot_axis, rot_angle);
