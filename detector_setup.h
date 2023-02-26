@@ -15,6 +15,8 @@
 class DetectorSetup {
 public:
     DetectorSetup() = delete;
+    DetectorSetup(const DetectorSetup& other);
+    DetectorSetup(DetectorSetup&& other);
     DetectorSetup(const std::vector<ExtrudedObject>& detectorlist);
 
     auto detectors() -> std::vector<ExtrudedObject>& { return m_detectors; }

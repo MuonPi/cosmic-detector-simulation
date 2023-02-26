@@ -12,6 +12,15 @@ DetectorSetup::DetectorSetup(const std::vector<ExtrudedObject>& detectorlist)
         m_ref_detector = m_detectors.begin();
 }
 
+DetectorSetup::DetectorSetup(const DetectorSetup& other)
+    : m_detectors( other.m_detectors )
+    , m_name( other.m_name )
+{
+    //!TODO: also copy the iterator pointing to the reference detector
+    if (!m_detectors.empty())
+        m_ref_detector = m_detectors.begin();
+}
+
 void DetectorSetup::rotate(const Vector& rot_axis, double rot_angle)
 {
     for (auto& detector : m_detectors) {
