@@ -316,14 +316,14 @@ MeasurementVector<double, double> cosmic_simulation_detector_sweep(const Detecto
     //std::cout<<"rot matrix of orig. setup:\n"<<setup.ref_detector()->get_rotation_matrix();
     auto rotated_setup { setup };
     //std::cout<<"rot matrix of copied setup:\n"<<rotated_setup.ref_detector()->get_rotation_matrix();
-    const double dtheta { (detector_max_angle - detector_min_angle) / nr_angles };
+    const double dtheta { (detector_max_angle - detector_min_angle) / std::max<std::size_t>(1, (nr_angles - 1)) };
     std::cout << "min angle=" << detector_min_angle << ", dtheta=" << dtheta << "\n";
     double angle { detector_min_angle };
     rotated_setup.rotate(detector_rotation_axis, detector_min_angle);
     for (std::size_t i = 0; i < nr_angles; ++i) {
+        std::cout << "current angle=" << toDeg(angle) << "deg\n";
         DataItem<double> item { cosmic_simulation(rotated_setup, gen, nr_events, nullptr, 90, toRad(90.), coinc_level) };
         data_series.emplace_back(DataItem<double>({ angle, dtheta }), std::move(item));
-        std::cout << "current angle=" << toDeg(angle) << "deg\n";
         angle += dtheta;
         rotated_setup.rotate(detector_rotation_axis, dtheta);
         //std::cout<<"rot matrix of rotated setup:\n"<<rotated_setup.ref_detector()->get_rotation_matrix();

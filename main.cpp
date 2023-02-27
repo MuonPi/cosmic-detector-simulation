@@ -132,6 +132,7 @@ auto main() -> int
     DetectorSetup setup { { /*ref_volume,*/ detector1, detector2 } };
 
     // simulate the effective area (geometric aperture) at theta=0 of the detector system
+    // this quantity may be used later to infer the expected detector count rate
     [[maybe_unused]] const double effective_area_sqm { simulate_geometric_aperture(setup, gen, nr_events) };
 
     // add a rotation to the system
@@ -152,7 +153,7 @@ auto main() -> int
 
     // now, run the full simulation and append the resulting histograms
     // to the already existing histogram vector
-    cosmic_simulation(setup, gen, nr_events * nr_bins, &histos, nr_bins, theta_max);
+    cosmic_simulation(setup, gen, nr_events, &histos, nr_bins, theta_max);
 
     // run a sweep over angular range of detector orientation
     // return a list of acceptance vs angle including statistical errors
