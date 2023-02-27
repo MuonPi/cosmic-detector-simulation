@@ -1,0 +1,26 @@
+# Gnuplot macro to print simulated output distributions
+# for acceptances vs. polar and azimuthal angles.
+# Execute as argument to gnuplot in the same folder
+# where the simulation output files are located
+# e.g.:
+# >linux:~/detector-simulation/build$ gnuplot ../tools/plot_histos.gpl
+
+# set output type to pdf
+set terminal pdf color
+# set output file name
+set output "output.pdf"
+
+set logscale y
+set multiplot layout 2,1 rowsfirst
+
+# x- and ytics for each row resp. column
+XTICS = "set xtics ('-2π' -2*pi,'-π' -pi, '-π/2' -pi/2 ,'0' 0, 'π/2' pi/2 ,'π' pi,'2π' 2*pi);\
+          set xlabel 'x'"
+
+plot "theta_distribution.hist" u ($2*180/pi):3 title "MC events", "accepted_theta_distribution.hist" u ($2*180/pi):3 title "accepted events"
+
+@XTICS
+plot "phi_distribution.hist" u 2:3 title "MC events", "accepted_phi_distribution.hist" u 2:3 title "accepted events"
+
+unset multiplot
+pause -1
