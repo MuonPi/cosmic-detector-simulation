@@ -22,6 +22,18 @@
 #include "simulation_algorithms.h"
 #include "utilities.h"
 
+/** @brief The cumulative distribution function (CDF) for the cos^2(x) PDF distribution
+ * This CDF is used for the calculation of the Probability Density Function (PDF)
+ * of the cos^2(x) distribution for generating random values following the angular distribution
+ * of the muon tracks
+ */
+auto cos2cdf = [](double x) {
+    //return cdf to following pdf: cos^2(x)
+    return (2 / pi()) * (x / 2. + sin(2. * x) / 4.) + 0.5; //from Wolfram Alpha
+};
+
+
+
 void theta_scan(const DetectorSetup& setup, std::mt19937& gen, std::size_t nr_events, double theta_min, double theta_max, std::size_t nr_bins, std::vector<Histogram>* histos)
 {
     if (setup.ref_detector() == setup.detectors().end()) {
