@@ -25,7 +25,6 @@
 constexpr double MEAN_ELOSS { 0.18 }; ///!< mean energy loss in MeV/mm
 constexpr double ELOSS_WIDTH { 0.2 * MEAN_ELOSS }; ///!< width of e loss distribution
 
-constexpr double c_sqrt2 { std::sqrt(2.) };
 
 /** @brief The cumulative distribution function (CDF) for the cos^2(x) PDF distribution
  * This CDF is used for the calculation of the Probability Density Function (PDF)

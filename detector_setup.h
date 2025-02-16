@@ -36,7 +36,7 @@ public:
 
     auto detectors() -> std::vector<ExtrudedObject>& { return m_detectors; }
     auto detectors() const -> const std::vector<ExtrudedObject>& { return m_detectors; }
-    const auto add_detector(const ExtrudedObject& det) -> std::vector<ExtrudedObject>::const_iterator;
+    auto add_detector(const ExtrudedObject& det) -> const std::vector<ExtrudedObject>::const_iterator;
     void set_ref_volume(const ExtrudedObject& ref_volume) { m_ref_volume = ref_volume; }
     void autogenerate_ref_volume();
     auto ref_volume() const -> const ExtrudedObject& { return m_ref_volume; }

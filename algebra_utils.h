@@ -11,8 +11,10 @@
 constexpr double DEFAULT_EPSILON { 1e-9 };
 constexpr double PI { 3.141592653589793238463 };
 constexpr double pi() { return PI; }
+//template<typename T>
+//T const pi = std::acos(-T(1));
 constexpr double twopi() { return pi() * 2; }
-const double sqrt2 { std::sqrt(2.) };
+const double c_sqrt2 { std::sqrt(2.) };
 
 /** @brief calculate euclidean norm (length) of vector
  * @param vec a vector of arbitrary dimension

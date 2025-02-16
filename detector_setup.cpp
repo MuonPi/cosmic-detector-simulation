@@ -51,7 +51,7 @@ DetectorSetup::DetectorSetup(DetectorSetup&& other)
 {
 }
 
-const auto DetectorSetup::add_detector(const ExtrudedObject& det) -> std::vector<ExtrudedObject>::const_iterator
+auto DetectorSetup::add_detector(const ExtrudedObject& det) -> const std::vector<ExtrudedObject>::const_iterator
 {
     m_detectors.emplace_back(det);
     return std::prev(m_detectors.cend());
